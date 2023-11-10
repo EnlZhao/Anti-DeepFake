@@ -1,25 +1,28 @@
 import argparse
 import json
-import os
+# import os
 from os.path import join
-import sys
-import matplotlib.image
-from tqdm import tqdm
-import nni
+# import sys
+# import matplotlib.image
+# from tqdm import tqdm
+# import nni
 
-import torch
+# import torch
 import torch.utils.data as data
-import torchvision.utils as vutils
-import torch.nn.functional as F
+# import torchvision.utils as vutils
+# import torch.nn.functional as F
 
 from data import CelebA
-import attacks
+# import attacks
 
-from AttGAN.attgan import AttGAN
-from AttGAN.data import check_attribute_conflict
-from AttGAN.helpers import Progressbar
-from AttGAN.utils import find_model
-import AttGAN.attacks as attgan_attack # Attack of AttGan
+##### Delete this part
+# from AttGAN.attgan import AttGAN
+# from AttGAN.data import check_attribute_conflict
+# from AttGAN.helpers import Progressbar
+# from AttGAN.utils import find_model
+# import AttGAN.attacks as attgan_attack # Attack of AttGan
+######
+
 from stargan.solver import Solver
 from AttentionGAN.AttentionGAN_v1_multi.solver import Solver as AttentionGANSolver
 from HiSD.inference import prepare_HiSD
@@ -53,10 +56,12 @@ def init_attGAN(args_attack):
     args.multi_gpu = args_attack.AttGAN.attgan_multi_gpu
     args.n_attrs = len(args.attrs)
     args.betas = (args.beta1, args.beta2)
-    attgan = AttGAN(args)
-    attgan.load(find_model(join('./AttGAN/output', args.experiment_name, 'checkpoint'), args.load_epoch))
-    attgan.eval()
-    return attgan, args
+    # attgan = AttGAN(args)
+    # attgan.load(find_model(join('./AttGAN/output', args.experiment_name, 'checkpoint'), args.load_epoch))
+    # attgan.eval()
+    # return attgan, args
+    print(args.attrs)
+    return args
 
 # init stargan
 def init_stargan(args_attack, test_dataloader):

@@ -17,13 +17,12 @@ import time
 from attacks import LinfPGDAttack
 
 # use cpu by default
-
 # device = 'cpu'
-
 # load checkpoint
 
+device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+
 def prepare_HiSD():
-    device = 'cuda:0' 
     config = get_config('HiSD/configs/celeba-hq_256.yaml')
     noise_dim = config['noise_dim']
     image_size = config['new_size']
@@ -55,7 +54,8 @@ def inference_to_attack(x, transform, F, T, G, E, reference, gen):
         s_trg = F(reference, 1)
         c_trg = T(c_trg, s_trg, 1)
         x_trg = G(c_trg)
-    attack.universal_perturb_HiSD(x.cuda(), transform, F, T, G, E, device, reference, x_trg, gen)
+    x = x.cuda() if device == 'cuda' else x
+    attack.universal_perturb_HiSD(x, transform, F, T, G, E, device, reference, x_trg, gen)
 
 
 

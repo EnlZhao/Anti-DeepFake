@@ -77,41 +77,40 @@ class LinfPGDAttack(object):
 
         return X, X - X_nat
 
-    # Ignore Attgan
-    def universal_perturb_attgan(self, X_nat, X_att, y, attgan):
-        """
-        Vanilla Attack.
-        """
-        #iter_up = self.att_up
-        if self.rand:
-            X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
-        else:
-            X = X_nat.clone().detach_()
+    ##################### Ignore Attgan #####################
+    # def universal_perturb_attgan(self, X_nat, X_att, y, attgan):
+    #     """
+    #     Vanilla Attack.
+    #     """
+    #     #iter_up = self.att_up
+    #     if self.rand:
+    #         X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
+    #     else:
+    #         X = X_nat.clone().detach_()
            
 
-        for i in range(self.k):
-            X.requires_grad = True
-            output = attgan.G(X, X_att)
+    #     for i in range(self.k):
+    #         X.requires_grad = True
+    #         output = attgan.G(X, X_att)
 
-            attgan.G.zero_grad()
-            # Minus in the loss means "towards" and plus means "away from"
-            loss = self.loss_fn(output, y)
-            loss.backward()
-            grad = X.grad
+    #         attgan.G.zero_grad()
+    #         # Minus in the loss means "towards" and plus means "away from"
+    #         loss = self.loss_fn(output, y)
+    #         loss.backward()
+    #         grad = X.grad
 
-            X_adv = X + self.a * grad.sign()
-            if self.up is None:
-                eta = torch.mean(torch.clamp(self.att_factor*(X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(), dim=0)
-                self.up = eta
-            else:
-                eta = torch.mean(torch.clamp(self.att_factor*(X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(), dim=0)
-                self.up = self.up * self.momentum + eta * (1 - self.momentum)
-            X = torch.clamp(X_nat + self.up, min=-1, max=1).detach_()
-        attgan.G.zero_grad()
-        return X, X - X_nat
+    #         X_adv = X + self.a * grad.sign()
+    #         if self.up is None:
+    #             eta = torch.mean(torch.clamp(self.att_factor*(X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(), dim=0)
+    #             self.up = eta
+    #         else:
+    #             eta = torch.mean(torch.clamp(self.att_factor*(X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(), dim=0)
+    #             self.up = self.up * self.momentum + eta * (1 - self.momentum)
+    #         X = torch.clamp(X_nat + self.up, min=-1, max=1).detach_()
+    #     attgan.G.zero_grad()
+    #     return X, X - X_nat
 
-    
-
+    ##################### StarGAN #####################
     def universal_perturb_stargan(self, X_nat, y, c_trg, model):
         """
         Vanilla Attack.
@@ -148,7 +147,7 @@ class LinfPGDAttack(object):
         return X, X - X_nat
 
 
-
+    ##################### AGGAN #####################
     def universal_perturb_attentiongan(self, X_nat, y, c_trg, model):
         """
         Vanilla Attack.
@@ -200,6 +199,7 @@ class LinfPGDAttack(object):
         model.zero_grad()
         return X, X - X_nat
 
+    ##################### HiSD #####################
     def universal_perturb_HiSD(self, X_nat, transform, F, T, G, E, reference, y, gen, mask):
 
         if self.rand and self.up is not None:

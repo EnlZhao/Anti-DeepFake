@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch import nn
 import numpy as np
 
-from AttGAN.data import check_attribute_conflict
+# from AttGAN.data import check_attribute_conflict
 
 class GaussianBlurConv(nn.Module):
     def __init__(self, channels=3):
@@ -70,7 +70,7 @@ def evaluate_multiple_models(args_attack, test_dataloader, attgan, attgan_args, 
     HiDF_prop_dist = float(n_dist) / n_samples
 
     # ------ IGNORE ------ # 
-    # # AttGAN inference and evaluating
+    ##################### AttGAN inference and evaluating #####################
     # l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     # n_dist, n_samples = 0, 0
     # for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
@@ -150,7 +150,7 @@ def evaluate_multiple_models(args_attack, test_dataloader, attgan, attgan_args, 
     stargan_results = 'stargan {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}. L_-inf error: {}.'.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples, min_dist / n_samples)
     stargan_prop_dist = float(n_dist) / n_samples
 
-    # AttentionGAN inference and evaluating
+    ##################### AttentionGAN inference and evaluating #####################
     l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
     for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
@@ -182,4 +182,5 @@ def evaluate_multiple_models(args_attack, test_dataloader, attgan, attgan_args, 
     print('attentiongan {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}. L_-inf error: {}.'.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples, min_dist / n_samples))
     AttentionGAN_results = 'attentiongan {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}. L_-inf error: {}.'.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples, min_dist / n_samples)
     aggan_prop_dist = float(n_dist) / n_samples
-    return HiDF_prop_dist, stargan_prop_dist, attgan_prop_dist, aggan_prop_dist
+    # return HiDF_prop_dist, stargan_prop_dist, attgan_prop_dist, aggan_prop_dist
+    return HiDF_prop_dist, stargan_prop_dist, aggan_prop_dist

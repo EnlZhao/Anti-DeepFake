@@ -15,7 +15,7 @@ import torchvision.utils as vutils
 import torch.nn.functional as F
 from torchvision import transforms
 
-from AttGAN.data import check_attribute_conflict
+# from AttGAN.data import check_attribute_conflict
 
 from data import CelebA
 import attacks
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     img = tf(img).unsqueeze(0)
 
 
-    # # AttGAN inference and evaluating
+    ##################### AttGAN inference and evaluating #####################
     # l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     # n_dist, n_samples = 0, 0
     # for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
@@ -129,7 +129,7 @@ if __name__ == "__main__":
         
     # print('AttGAN {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}. L_-inf error: {}.'.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples, min_dist / n_samples))
 
-    # stargan inference and evaluating
+    ##################### stargan inference and evaluating #####################
     l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
     for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
@@ -164,7 +164,7 @@ if __name__ == "__main__":
         break
     print('stargan {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}. L_-inf error: {}.'.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples, min_dist / n_samples))
 
-    # AttentionGAN inference and evaluating
+    ##################### AttentionGAN inference and evaluating #####################
     l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
     for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
