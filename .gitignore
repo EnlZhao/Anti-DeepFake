@@ -3,7 +3,7 @@
 *.jpg
 *.jpeg
 /weights
-# weights/**/*.pth
+*.pth
 *.npy
 *.ckpt
 *.pyc
