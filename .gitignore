@@ -9,3 +9,4 @@
 *.pyc
 *.pt
 *.tar.gz
+/stargan/data/*
