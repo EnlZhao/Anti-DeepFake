@@ -23,7 +23,7 @@ from evaluate import evaluate_multiple_models
 
 class ObjDict(dict):
     """
-    Makes a  dictionary behave like an object,with attribute-style access.
+    Make a dictionary behave like an object, with attribute-style access.
     """
     def __getattr__(self,name):
         try:

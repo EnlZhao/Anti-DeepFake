@@ -2,7 +2,8 @@
 *.png
 *.jpg
 *.jpeg
-*.pth
+/weights
+# weights/**/*.pth
 *.npy
 *.ckpt
 *.pyc
