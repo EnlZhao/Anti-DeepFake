@@ -2,10 +2,12 @@
 *.png
 *.jpg
 *.jpeg
+/weights
 *.pth
 *.npy
 *.ckpt
 *.pyc
 *.pt
 *.tar.gz
+
 **/.vscode

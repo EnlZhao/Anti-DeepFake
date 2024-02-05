@@ -23,7 +23,7 @@ from evaluate import evaluate_multiple_models
 
 class ObjDict(dict):
     """
-    Makes a  dictionary behave like an object,with attribute-style access.
+    Make a dictionary behave like an object, with attribute-style access.
     """
     def __getattr__(self,name):
         try:
@@ -77,13 +77,13 @@ for i in range(1):
         if idx == 0:
             img_a_last = copy.deepcopy(img_a)
 
-        # attack stargan
+        ##################### attack stargan #####################
         solver.test_universal_model_level_attack(idx, img_a, c_org, pgd_attack)
 
-        # attack attentiongan
+        ##################### attack attentiongan #####################
         attentiongan_solver.test_universal_model_level_attack(idx, img_a, c_org, pgd_attack)
 
-        # attack HiSD
+        ##################### attack HiSD #####################
         with torch.no_grad():
             c = E(img_a)
             c_trg = c
@@ -96,21 +96,21 @@ for i in range(1):
             mask[mask<0.5] = 0
         pgd_attack.universal_perturb_HiSD(img_a.cuda(), transform, F, T, G, E, reference, x_trg+0.002, gen_models, mask)
 
-        # attack AttGAN
-        att_b_list = [att_a]
-        for i in range(attgan_args.n_attrs):
-            tmp = att_a.clone()
-            tmp[:, i] = 1 - tmp[:, i]
-            tmp = check_attribute_conflict(tmp, attgan_args.attrs[i], attgan_args.attrs)
-            att_b_list.append(tmp)
+        ##################### attack AttGAN #####################
+        # att_b_list = [att_a]
+        # for i in range(attgan_args.n_attrs):
+        #     tmp = att_a.clone()
+        #     tmp[:, i] = 1 - tmp[:, i]
+        #     tmp = check_attribute_conflict(tmp, attgan_args.attrs[i], attgan_args.attrs)
+        #     att_b_list.append(tmp)
 
-        for i, att_b in enumerate(att_b_list):
-            att_b_ = (att_b * 2 - 1) * attgan_args.thres_int
-            if i > 0:
-                att_b_[..., i - 1] = att_b_[..., i - 1] * attgan_args.test_int / attgan_args.thres_int
-            with torch.no_grad():
-                gen_noattack = attgan.G(img_a, att_b_)
-            x_adv, perturb = pgd_attack.universal_perturb_attgan(img_a, att_b_, gen_noattack, attgan)
+        # for i, att_b in enumerate(att_b_list):
+        #     att_b_ = (att_b * 2 - 1) * attgan_args.thres_int
+        #     if i > 0:
+        #         att_b_[..., i - 1] = att_b_[..., i - 1] * attgan_args.test_int / attgan_args.thres_int
+        #     with torch.no_grad():
+        #         gen_noattack = attgan.G(img_a, att_b_)
+        #     x_adv, perturb = pgd_attack.universal_perturb_attgan(img_a, att_b_, gen_noattack, attgan)
 
         torch.save(pgd_attack.up, args_attack.global_settings.universal_perturbation_path)
         print('save the CMUA-Watermark')

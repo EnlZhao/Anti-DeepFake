@@ -21,13 +21,13 @@ class CelebA(data.Dataset):
         labels = np.loadtxt(attr_path, skiprows=2, usecols=atts, dtype=np.int)
         
         if mode == 'train':
-            self.images = images[:182000]
+            self.images = images[:182000] # 比例约 0.898
             self.labels = labels[:182000]
         if mode == 'valid':
-            self.images = images[182000:182637]
+            self.images = images[182000:182637] # 比例约 0.003
             self.labels = labels[182000:182637]
         if mode == 'test':
-            self.images = images[182637:]
+            self.images = images[182637:] # 比例约 0.099
             self.labels = labels[182637:]
         
         self.tf = transforms.Compose([

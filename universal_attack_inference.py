@@ -12,7 +12,7 @@ import torch.utils.data as data
 import torchvision.utils as vutils
 import torch.nn.functional as F
 
-from AttGAN.data import check_attribute_conflict
+# from AttGAN.data import check_attribute_conflict
 
 from data import CelebA
 import attacks
