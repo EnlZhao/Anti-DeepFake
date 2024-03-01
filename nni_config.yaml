@@ -1,0 +1,30 @@
+authorName: HengZhao
+experimentName: AntiDepfake
+trialConcurrency: 1
+maxExecDuration: 10h
+maxTrialNum: 20
+trainingServicePlatform: local
+searchSpacePath: search_space.json
+useAnnotation: false
+
+localConfig:
+   useActiveGpu: True
+  #  gpuIndices: 0
+   maxTrialNumPerGpu: 1
+
+tuner:
+#choice: TPE, Random, Anneal, Evolution, BatchTuner, MetisTuner, GPTuner
+#SMAC (SMAC should be installed through nnictl)
+  builtinTunerName: TPE
+  classArgs:
+    optimize_mode: maximize
+    # tpe_args.n_ei_candidates: 24 #default 24 EI
+
+trial:
+  command: python universal_attack_nni.py
+  codeDir: .
+  gpuNum: 1
+  
+logDir: ./nni_logs
+  
+  
