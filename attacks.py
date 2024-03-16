@@ -1,12 +1,12 @@
 import copy
 import numpy as np
-from collections import Iterable
-from scipy.stats import truncnorm
+
+# from scipy.stats import truncnorm
 
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
-import torchvision.utils as vutils
+# from torch.autograd import Variable
+# import torchvision.utils as vutils
 
 try:
     import defenses.smoothing as smoothing

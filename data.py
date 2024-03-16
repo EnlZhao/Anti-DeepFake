@@ -1,11 +1,11 @@
 from torch.utils import data
 from torchvision import transforms
-from torchvision.datasets import ImageFolder
+# from torchvision.datasets import ImageFolder
 from PIL import Image
 import torch
 import os
-import random
-import cv2
+# import random
+# import cv2
 import numpy as np
 
 class CelebA(data.Dataset):

@@ -55,6 +55,7 @@ def inference_to_attack(x, transform, F, T, G, E, reference, gen):
         s_trg = F(reference, 1)
         c_trg = T(c_trg, s_trg, 1)
         x_trg = G(c_trg)
+    device = 'cuda:0'
     attack.universal_perturb_HiSD(x.cuda(), transform, F, T, G, E, device, reference, x_trg, gen)
 
 

@@ -1,23 +1,23 @@
 import argparse
-import copy
+# import copy
 import json
 import os
 from os.path import join
-import sys
-import matplotlib.image
-from tqdm import tqdm
+# import sys
+# import matplotlib.image
+# from tqdm import tqdm
 
 
 import torch
-import torch.utils.data as data
-import torchvision.utils as vutils
+# import torch.utils.data as data
+# import torchvision.utils as vutils
 import torch.nn.functional as F
 
-from AttGAN.data import check_attribute_conflict
+# from AttGAN.data import check_attribute_conflict
 
 
 
-from data import CelebA
+# from data import CelebA
 import attacks
 
 from model_data_prepare import prepare
@@ -44,6 +44,8 @@ def parse(args=None):
     return args_attack
 
 
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
+
 args_attack = parse()
 print(args_attack)
 os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.momentum))
@@ -65,8 +67,10 @@ if args_attack.global_settings.universal_perturbation_path:
 
 
 # Init the attacked models
-attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
+# attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
+attack_dataloader, test_dataloader, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
 print("finished init the attacked models")
 
 print('The size of CMUA-Watermark: ', pgd_attack.up.shape)
+attgan = None
 evaluate_multiple_models(args_attack, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models, pgd_attack)

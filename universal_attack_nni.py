@@ -2,18 +2,18 @@ import argparse
 import json
 import os
 from os.path import join
-import sys
-import matplotlib.image
+# import sys
+# import matplotlib.image
 from tqdm import tqdm
 
 
 import torch
-import torch.utils.data as data
+# import torch.utils.data as data
 import torchvision.utils as vutils
-import torch.nn.functional as F
+# import torch.nn.functional as F
 
 
-from data import CelebA
+# from data import CelebA
 import attacks
 
 from model_data_prepare import prepare

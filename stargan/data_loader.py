@@ -5,7 +5,7 @@ from PIL import Image
 import torch
 import os
 import random
-import cv2
+# import cv2
 
 class CelebA(data.Dataset):
     """Dataset class for the CelebA dataset."""

@@ -1,4 +1,4 @@
-from torch.autograd import Variable
+# from torch.autograd import Variable
 from torchvision.utils import save_image
 import torch
 import torch.nn.functional as F
@@ -8,19 +8,19 @@ import time
 import datetime
 
 try:
-    from model import Generator, AvgBlurGenerator
+    from model import Generator #, AvgBlurGenerator
     from model import Discriminator
     import defenses.smoothing as smoothing
     import attacks
 except:
-    from .model import Generator, AvgBlurGenerator
+    from .model import Generator #, AvgBlurGenerator
     from .model import Discriminator
     import stargan.defenses.smoothing as smoothing
     import stargan.attacks as attacks
 
-from PIL import ImageFilter
-from PIL import Image
-from torchvision import transforms
+# from PIL import ImageFilter
+# from PIL import Image
+# from torchvision import transforms
 
 # torch.manual_seed(0)
 # torch.backends.cudnn.deterministic = True

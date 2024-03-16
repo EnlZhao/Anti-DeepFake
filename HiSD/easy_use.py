@@ -12,8 +12,8 @@ import numpy as np
 import time
 
 # use cpu by default
-# device = 'cuda:0' 
-device = 'cpu'
+device = 'cuda:0' 
+# device = 'cpu'
 
 # load checkpoint
 config = get_config('configs/celeba-hq_256.yaml')

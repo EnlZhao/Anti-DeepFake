@@ -1,21 +1,21 @@
 import argparse
-import copy
+# import copy
 import json
 import os
 from os.path import join
-import sys
-import matplotlib.image
+# import sys
+# import matplotlib.image
 from tqdm import tqdm
 
 
 import torch
-import torch.utils.data as data
-import torchvision.utils as vutils
+# import torch.utils.data as data
+# import torchvision.utils as vutils
 import torch.nn.functional as F
 
 # from AttGAN.data import check_attribute_conflict
 
-from data import CelebA
+# from data import CelebA
 import attacks
 
 from model_data_prepare import prepare
@@ -40,9 +40,11 @@ def parse(args=None):
         
     return args_attack
 
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
+
 torch.backends.cudnn.enabled = False
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-# device='cuda'
+device='cuda'
 
 args_attack = parse()
 print(args_attack)
@@ -64,13 +66,14 @@ def init_Attack(args_attack):
 pgd_attack = init_Attack(args_attack)
 
 # 载入已有扰动
-# if args_attack.global_settings.universal_perturbation_path:
-#     pgd_attack.up = torch.load(args_attack.global_settings.universal_perturbation_path)
+if args_attack.global_settings.init_perturbation_path:
+    pgd_attack.up = torch.load(args_attack.global_settings.init_perturbation_path)
 
 
 # init the attacker models
-attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
-print("finished init the attacked models, only attack 2 epochs")
+# attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
+attack_dataloader, test_dataloader, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
+print("finished init the attacked models, only attack 8 epochs")
 # print(" ------------- ")
 # # print img_a 
 # for idx, (img_a, att_a, c_org) in enumerate(tqdm(attack_dataloader)):
@@ -87,7 +90,7 @@ print("finished init the attacked models, only attack 2 epochs")
 #     print(" ------------- ")
 
 # attacking models
-for i in range(1):
+for i in range(7):
     for idx, (img_a, att_a, c_org) in enumerate(tqdm(attack_dataloader)):
         if args_attack.global_settings.num_test is not None and idx * args_attack.global_settings.batch_size == args_attack.global_settings.num_test:
             break
@@ -115,7 +118,7 @@ for i in range(1):
             mask = mask[0,0,:,:] + mask[0,1,:,:] + mask[0,2,:,:]
             mask[mask>0.5] = 1
             mask[mask<0.5] = 0
-        pgd_attack.universal_perturb_HiSD(img_a.cuda(), transform, F, T, G, E, reference, x_trg+0.002, gen_models, mask)
+        pgd_attack.universal_perturb_HiSD(img_a, transform, F, T, G, E, reference, x_trg+0.002, gen_models, mask)
 
         # attack AttGAN
         att_b_list = [att_a]
@@ -140,4 +143,5 @@ for i in range(1):
         
 
 print('The size of CMUA-Watermark: ', pgd_attack.up.shape)
+attgan = None
 evaluate_multiple_models(args_attack, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models, pgd_attack)

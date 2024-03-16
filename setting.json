@@ -5,9 +5,10 @@
         "results_path":"./data/disrupting-deepfakes-results/",
         "img_size":256,
         "num_test":128,
-        "gpu":1,
-        "universal_perturbation_path":"./perturbation.pt",
-        "batch_size":64
+        "gpu":0,
+        "universal_perturbation_path":"./results/perturbation.pt",
+        "init_perturbation_path":"./perturbation.pt",
+        "batch_size":16
     },
     "attacks":{
         "momentum":0.5,
@@ -68,7 +69,7 @@
         "attr_path":"./data/list_attr_celeba.txt",
         "img_size":256,
         "num_test":10,
-        "gpu":1,
+        "gpu":0,
         "universal":1,
         "log_dir":"./stargan/stargan/logs",
         "sample_dir":"./stargan/stargan/samples"
@@ -115,7 +116,7 @@
         "attr_path":"./data/list_attr_celeba.txt",
         "img_size":256,
         "num_test":10,
-        "gpu":1,
+        "gpu":0,
         "universal":1,
         "log_dir":"./attentiongan/attentiongan/logs",
         "sample_dir":"./attentiongan/attentiongan/samples"
