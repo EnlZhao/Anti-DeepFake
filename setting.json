@@ -8,7 +8,7 @@
         "gpu":0,
         "universal_perturbation_path":"./results/perturbation.pt",
         "init_perturbation_path":"./perturbation.pt",
-        "batch_size":16
+        "batch_size":64
     },
     "attacks":{
         "momentum":0.5,

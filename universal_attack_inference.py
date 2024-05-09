@@ -1,28 +1,15 @@
 import argparse
-# import copy
 import json
 import os
 from os.path import join
-# import sys
-# import matplotlib.image
-# from tqdm import tqdm
-
 
 import torch
-# import torch.utils.data as data
-# import torchvision.utils as vutils
 import torch.nn.functional as F
 
-# from AttGAN.data import check_attribute_conflict
-
-
-
-# from data import CelebA
 import attacks
 
 from model_data_prepare import prepare
 from evaluate import evaluate_multiple_models
-
 
 class ObjDict(dict):
     """
@@ -39,7 +26,6 @@ class ObjDict(dict):
 def parse(args=None):
     with open(join('./setting.json'), 'r') as f:
         args_attack = json.load(f, object_hook=lambda d: argparse.Namespace(**d))
-
         
     return args_attack
 
@@ -58,19 +44,15 @@ def init_Attack(args_attack):
     pgd_attack = attacks.LinfPGDAttack(model=None, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), epsilon=args_attack.attacks.epsilon, step=args_attack.attacks.step, alpha=args_attack.attacks.alpha, star_factor=args_attack.attacks.star_factor, attention_factor=args_attack.attacks.attention_factor, att_factor=args_attack.attacks.att_factor, HiSD_factor=args_attack.attacks.HiSD_factor, args=args_attack.attacks)
     return pgd_attack
 
-
 pgd_attack = init_Attack(args_attack)
 
 # load the trained CMUA-Watermark
 if args_attack.global_settings.universal_perturbation_path:
     pgd_attack.up = torch.load(args_attack.global_settings.universal_perturbation_path)
 
-
 # Init the attacked models
-# attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
-attack_dataloader, test_dataloader, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
+attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
 print("finished init the attacked models")
 
 print('The size of CMUA-Watermark: ', pgd_attack.up.shape)
-attgan = None
-evaluate_multiple_models(args_attack, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models, pgd_attack)
+evaluate_multiple_models(args_attack, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models, pgd_attack)

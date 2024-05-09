@@ -1,17 +1,7 @@
 import copy
 import numpy as np
-
-# from scipy.stats import truncnorm
-
 import torch
 import torch.nn as nn
-# from torch.autograd import Variable
-# import torchvision.utils as vutils
-
-try:
-    import defenses.smoothing as smoothing
-except:
-    import AttGAN.defenses.smoothing as smoothing
 
 class LinfPGDAttack(object):
     def __init__(self, model=None, device=None, epsilon=0.05, step=10, alpha=0.01, star_factor=0.3, attention_factor=0.3, att_factor=2, HiSD_factor=1, feat=None, args=None):
@@ -44,7 +34,6 @@ class LinfPGDAttack(object):
         #factors to control models' weights
         self.star_factor = star_factor
         self.attention_factor = attention_factor
-        self.att_factor = att_factor
         self.HiSD_factor = HiSD_factor
     def perturb(self, X_nat, y, c_trg):
         """
@@ -75,41 +64,6 @@ class LinfPGDAttack(object):
         self.model.zero_grad()
 
         return X, X - X_nat
-
-    # Ignore Attgan
-    def universal_perturb_attgan(self, X_nat, X_att, y, attgan):
-        """
-        Vanilla Attack.
-        """
-        #iter_up = self.att_up
-        if self.rand:
-            X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
-        else:
-            X = X_nat.clone().detach_()
-           
-
-        for i in range(self.step):
-            X.requires_grad = True
-            output = attgan.G(X, X_att)
-
-            attgan.G.zero_grad()
-            # Minus in the loss means "towards" and plus means "away from"
-            loss = self.loss_fn(output, y)
-            loss.backward()
-            grad = X.grad
-
-            X_adv = X + self.alpha * grad.sign()
-            if self.up is None:
-                eta = torch.mean(torch.clamp(self.att_factor*(X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(), dim=0)
-                self.up = eta
-            else:
-                eta = torch.mean(torch.clamp(self.att_factor*(X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(), dim=0)
-                self.up = self.up * self.momentum + eta * (1 - self.momentum)
-            X = torch.clamp(X_nat + self.up, min=-1, max=1).detach_()
-        attgan.G.zero_grad()
-        return X, X - X_nat
-
-    
 
     def universal_perturb_stargan(self, X_nat, y, c_trg, model):
         """
@@ -145,8 +99,6 @@ class LinfPGDAttack(object):
             # print(loss.item())
         model.zero_grad()
         return X, X - X_nat
-
-
 
     def universal_perturb_attentiongan(self, X_nat, y, c_trg, model):
         """
@@ -235,8 +187,7 @@ class LinfPGDAttack(object):
             X = torch.clamp(X_nat + self.up, min=-1, max=1).detach_()            
         gen.zero_grad()
         return X, X - X_nat
-        
-        
+           
 def clip_tensor(X, Y, Z):
     # Clip X with Y min and Z max
     X_np = X.data.cpu().numpy()

@@ -42,7 +42,7 @@ def parse(args=None):
     return args_attack
 
 # init AttGAN
-def init_attGAN(args_attack):
+def init_args(args_attack):
     with open(join('./AttGAN/output', args_attack.AttGAN.attgan_experiment_name, 'setting.txt'), 'r') as f:
         args = json.load(f, object_hook=lambda d: argparse.Namespace(**d))
 
@@ -96,10 +96,9 @@ def init_inference_data(args_attack, attgan_args):
 def prepare():
     # prepare deepfake models
     args_attack = parse()
-    # attgan, attgan_args = init_attGAN(args_attack)
-    attgan_args = init_attGAN(args_attack)
-    attack_dataloader = init_attack_data(args_attack, attgan_args)
-    test_dataloader = init_inference_data(args_attack, attgan_args)
+    args = init_args(args_attack)
+    attack_dataloader = init_attack_data(args_attack, args)
+    test_dataloader = init_inference_data(args_attack, args)
     solver = init_stargan(args_attack, test_dataloader)
     solver.restore_model(solver.test_iters)
     attentiongan_solver = init_attentiongan(args_attack, test_dataloader)
@@ -107,8 +106,7 @@ def prepare():
     transform, F, T, G, E, reference, gen_models = prepare_HiSD()
     print("Finished deepfake models initialization!")
     # return attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models
-    return attack_dataloader, test_dataloader, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models
-
+    return attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models
 
 if __name__=="__main__":
     prepare()
