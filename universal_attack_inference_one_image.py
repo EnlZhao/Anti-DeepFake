@@ -152,6 +152,8 @@ if __name__ == "__main__":
     n_dist, n_samples = 0, 0
     for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
         img_a = img_a.cuda() if args_attack.global_settings.gpu else img_a
+        att_a = att_a.cuda() if args_attack.global_settings.gpu else att_a
+        att_a = att_a.type(torch.float)
         
         with torch.no_grad():
             # clean
