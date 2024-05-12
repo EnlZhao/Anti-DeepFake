@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     # Init the attacked models
     # attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F_, T, G, E, reference, gen_models = prepare()
-    attack_dataloader, test_dataloader, attgan_args, solver, attentiongan_solver, transform, F_, T, G, E, reference, gen_models = prepare()
+    attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F_, T, G, E, reference, gen_models = prepare()
     print("finished init the attacked models")
 
     # tf = transforms.Compose([
