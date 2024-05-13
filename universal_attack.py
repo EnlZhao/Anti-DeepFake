@@ -13,7 +13,9 @@ if torch.cuda.is_available():
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 args_attack = parse()
-print(args_attack)
+# 如果文件不存在
+if not os.path.exists('results'):
+    os.makedirs('results')
 os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.momentum))
 print("experiment dir is created")
 os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.momentum))))
