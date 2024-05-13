@@ -8,7 +8,7 @@
         "gpu":1,
         "universal_watermark_path":"./results/perturbation.pt",
         "init_watermark_path":"./perturbation.pt",
-        "batch_size":64
+        "batch_size":16
     },
     "attacks":{
         "momentum":0.5,

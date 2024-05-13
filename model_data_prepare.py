@@ -9,6 +9,14 @@ from stargan.solver import Solver
 from AttentionGAN.AttentionGAN_v1_multi.solver import Solver as AttentionGANSolver
 from HiSD.inference import prepare_HiSD
 
+device = None
+if torch.cuda.is_available():
+    device = 'cuda'
+elif torch.backends.mps.is_available():
+    device = 'mps'
+else:
+    device = 'cpu'
+
 # init setting
 def parse(args=None):
     with open(join('./setting.json'), 'r') as f:
@@ -17,7 +25,7 @@ def parse(args=None):
 
 # init attacker
 def init_Attacker(args_attack):
-    pgd_attack = attacks.LinfPGDAttack(model=None, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), epsilon=args_attack.attacks.epsilon, k=args_attack.attacks.k, a=args_attack.attacks.a, star_factor=args_attack.attacks.star_factor, attention_factor=args_attack.attacks.attention_factor, HiSD_factor=args_attack.attacks.HiSD_factor, args=args_attack.attacks)
+    pgd_attack = attacks.LinfPGDAttack(model=None, device=device, epsilon=args_attack.attacks.epsilon, k=args_attack.attacks.k, a=args_attack.attacks.a, star_factor=args_attack.attacks.star_factor, attention_factor=args_attack.attacks.attention_factor, HiSD_factor=args_attack.attacks.HiSD_factor, args=args_attack.attacks)
     return pgd_attack
 
 # init AttGAN

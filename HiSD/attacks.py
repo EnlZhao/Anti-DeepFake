@@ -8,9 +8,16 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
+device = None
+if torch.cuda.is_available():
+    device = 'cuda'
+elif torch.backends.mps.is_available():
+    device = 'mps'
+else:
+    device = 'cpu'
 
 class LinfPGDAttack(object):
-    def __init__(self, model=None, device='cuda:0', epsilon=0.05, k=100, a=0.01, star_factor=1, attention_factor=0.3, att_factor=2, feat=None, args=None):
+    def __init__(self, model=None, device=device, epsilon=0.05, k=100, a=0.01, star_factor=1, attention_factor=0.3, att_factor=2, feat=None, args=None):
         """
         FGSM, I-FGSM and PGD attacks
         epsilon: magnitude of attack

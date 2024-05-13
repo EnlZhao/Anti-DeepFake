@@ -17,7 +17,13 @@ import time
 from attacks import LinfPGDAttack
 
 # use GPU if available
-device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+device = None
+if torch.cuda.is_available():
+    device = 'cuda'
+elif torch.backends.mps.is_available():
+    device = 'mps'
+else:
+    device = 'cpu'
 
 def prepare_HiSD():
     config = get_config('HiSD/configs/celeba-hq_256.yaml')

@@ -13,6 +13,13 @@ import os
 import time
 import datetime
 
+device = None
+if torch.cuda.is_available():
+    device = 'cuda'
+elif torch.backends.mps.is_available():
+    device = 'mps'
+else:
+    device = 'cpu'
 
 class Solver(object):
     """
@@ -57,7 +64,7 @@ class Solver(object):
 
         # Miscellaneous.
         self.use_tensorboard = config.use_tensorboard
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = device
 
         # Directories.
         self.log_dir = config.log_dir

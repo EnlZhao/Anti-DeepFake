@@ -1,7 +1,5 @@
 import copy
 import numpy as np
-from collections import Iterable
-from scipy.stats import truncnorm
 
 import torch
 import torch.nn as nn

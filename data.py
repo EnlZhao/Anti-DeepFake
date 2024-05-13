@@ -30,8 +30,8 @@ class CelebA(data.Dataset):
         self.stargan_selected_attrs = stargan_selected_attrs
         att_list = open(attr_path, 'r', encoding='utf-8').readlines()[1].split()
         atts = [att_list.index(att) + 1 for att in selected_attrs]
-        images = np.loadtxt(attr_path, skiprows=2, usecols=[0], dtype=np.str)
-        labels = np.loadtxt(attr_path, skiprows=2, usecols=atts, dtype=np.int)
+        images = np.loadtxt(attr_path, skiprows=2, usecols=[0], dtype=np.str_)
+        labels = np.loadtxt(attr_path, skiprows=2, usecols=atts, dtype=np.int64)
         
         if mode == 'train':
             self.images = images[:182000]

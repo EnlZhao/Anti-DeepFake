@@ -14,8 +14,15 @@ class LinfPGDAttack(object):
         self.epsilon = epsilon
         self.step = k
         self.alpha = a
-        self.loss_fn = nn.MSELoss().to(device)
-        self.device = device
+        if device is not None:
+            self.device = device
+        elif torch.cuda.is_available():
+            self.device = 'cuda'
+        elif torch.backends.mps.is_available():
+            self.device = 'mps'
+        else:
+            self.device = 'cpu'
+        self.loss_fn = nn.MSELoss().to(self.device)
 
         # Feature-level attack? Which layer?
         self.feat = feat
@@ -71,7 +78,6 @@ class LinfPGDAttack(object):
         """
         Vanilla Attack.
         """
-        #iter_up = self.attention_up
         if self.rand:
             X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
         else:

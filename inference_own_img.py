@@ -24,10 +24,10 @@ if __name__ == "__main__":
 
     # load the trained CMUA-Watermark
     if args_attack.global_settings.init_watermark_path:
-        pgd_attack.up = torch.load(args_attack.global_settings.init_watermark_path, map_location=device)
+        pgd_attack.up = torch.load(args_attack.global_settings.init_watermark_path, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
     # Init the attacked models
-    _, test_dataloader, solver, attentiongan_solver, _, F, T, G, E, reference, _ = prepare()
+    attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
     print("finished init the attacked models")
 
     tf = transforms.Compose([
@@ -63,16 +63,16 @@ if __name__ == "__main__":
         
         # save original image
         out_file = './demo_results/stargan_original.jpg'
-        vutils.save_image(img_a.cpu(), out_file, nrow=1, normalize=True, value_range=(-1., 1.))
+        vutils.save_image(img_a.cpu(), out_file, nrow=1, normalize=True, range=(-1., 1.))
         for j in range(len(x_fake_list)):
             # save original image generated images
             gen_noattack = x_noattack_list[j]
             out_file = './demo_results/stargan_gen_{}.jpg'.format(j)
-            vutils.save_image(gen_noattack, out_file, nrow=1, normalize=True, value_range=(-1., 1.))
+            vutils.save_image(gen_noattack, out_file, nrow=1, normalize=True, range=(-1., 1.))
             # save adversarial generated images
             gen = x_fake_list[j]
             out_file = './demo_results/stargan_advgen_{}.jpg'.format(j)
-            vutils.save_image(gen, out_file, nrow=1, normalize=True, value_range=(-1., 1.))
+            vutils.save_image(gen, out_file, nrow=1, normalize=True, range=(-1., 1.))
         break
     print('stargan {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}. L_-inf error: {}.'.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples, min_dist / n_samples))
 
@@ -98,17 +98,17 @@ if __name__ == "__main__":
         
         # save original image
         out_file = './demo_results/attentiongan_original.jpg'
-        vutils.save_image(img_a.cpu(), out_file, nrow=1, normalize=True, value_range=(-1., 1.))
+        vutils.save_image(img_a.cpu(), out_file, nrow=1, normalize=True, range=(-1., 1.))
         for j in range(len(x_fake_list)):
             # save original image generated images
             gen_noattack = x_noattack_list[j]
             out_file = './demo_results/attentiongan_gen_{}.jpg'.format(j)
-            vutils.save_image(gen_noattack, out_file, nrow=1, normalize=True, value_range=(-1., 1.))
+            vutils.save_image(gen_noattack, out_file, nrow=1, normalize=True, range=(-1., 1.))
             
             # save adversarial generated images
             gen = x_fake_list[j]
             out_file = './demo_results/attentiongan_advgen_{}.jpg'.format(j)
-            vutils.save_image(gen, out_file, nrow=1, normalize=True, value_range=(-1., 1.))
+            vutils.save_image(gen, out_file, nrow=1, normalize=True, range=(-1., 1.))
         break
     print('attentiongan {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}. L_-inf error: {}.'.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples, min_dist / n_samples))
 
@@ -149,16 +149,16 @@ if __name__ == "__main__":
 
             # save original image
             out_file = './demo_results/HiSD_original.jpg'
-            vutils.save_image(img_a.cpu(), out_file, nrow=1, normalize=True, value_range=(-1., 1.))
+            vutils.save_image(img_a.cpu(), out_file, nrow=1, normalize=True, range=(-1., 1.))
             
             # save deepfake images generated from clean image
             out_file = './demo_results/HiSD_gen.jpg'
-            vutils.save_image(gen_noattack, out_file, nrow=1, normalize=True, value_range=(-1., 1.))
+            vutils.save_image(gen_noattack, out_file, nrow=1, normalize=True, range=(-1., 1.))
 
             # save deepfake images generated from watermarked image
             gen = x_fake_list[j]
             out_file = './demo_results/HiSD_advgen.jpg'
-            vutils.save_image(gen, out_file, nrow=1, normalize=True, value_range=(-1., 1.))
+            vutils.save_image(gen, out_file, nrow=1, normalize=True, range=(-1., 1.))
         break
     print('HiDF {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}. L_-inf error: {}.'.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples, min_dist / n_samples))
 
