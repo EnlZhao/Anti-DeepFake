@@ -60,6 +60,10 @@ ln -s stargan/data/celeba ./data
 mklink /D data stargan\data\celeba
 ```
 
+创建好可以看到这样的效果：
+
+![alt text](./demo_results/readme_image.png)
+
 ### 3. 加载模型的权重
 
 - 将百度网盘中的权重解压缩后移动到相应的位置（需要你先创建相应的文件夹）
