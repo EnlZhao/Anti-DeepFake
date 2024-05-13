@@ -13,4 +13,4 @@ torchsummary
 torchvision
 tqdm
 visdom
-# nni
+nni

@@ -6,8 +6,7 @@
 
 ### 1. Python 环境
 
-> Python 3.6 or Python 3.7 (更高版本尚未尝试) (对应的包版本皆为对应 python 版本中的最新版本)
-
+- Python 3.8
 - install the lib by pip (推荐 conda or pipenv)
 
 ```
