@@ -12,3 +12,4 @@
 /**/.DS_Store
 /data
 !demo_results/readme_image.png
+nni_logs/*
