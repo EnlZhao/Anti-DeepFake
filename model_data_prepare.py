@@ -30,7 +30,7 @@ def init_Attacker(args_attack):
 
 # init AttGAN
 def init_args(args_attack):
-    with open(join('./AttGAN/output', args_attack.AttGAN.attgan_experiment_name, 'setting.txt'), 'r') as f:
+    with open(join('./stargan/setting.txt'), 'r') as f:
         args = json.load(f, object_hook=lambda d: argparse.Namespace(**d))
 
     # args.test_int = args_attack.AttGAN.attgan_test_int
