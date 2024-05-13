@@ -47,8 +47,8 @@ def init_Attack(args_attack):
 pgd_attack = init_Attack(args_attack)
 
 # load the trained CMUA-Watermark
-if args_attack.global_settings.init_perturbation_path:
-    pgd_attack.up = torch.load(args_attack.global_settings.init_perturbation_path, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+if args_attack.global_settings.init_watermark_path:
+    pgd_attack.up = torch.load(args_attack.global_settings.init_watermark_path, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
 # Init the attacked models
 attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()

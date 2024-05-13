@@ -56,8 +56,8 @@ def init_Attack(args_attack):
 pgd_attack = init_Attack(args_attack)
 
 # 载入已有扰动
-if args_attack.global_settings.init_perturbation_path:
-    pgd_attack.up = torch.load(args_attack.global_settings.init_perturbation_path, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+if args_attack.global_settings.init_watermark_path:
+    pgd_attack.up = torch.load(args_attack.global_settings.init_watermark_path, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
 # init the attacker models
 # attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()

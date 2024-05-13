@@ -6,8 +6,8 @@
         "img_size":256,
         "num_test":128,
         "gpu":1,
-        "universal_perturbation_path":"./results/perturbation.pt",
-        "init_perturbation_path":"./perturbation.pt",
+        "universal_watermark_path":"./results/perturbation.pt",
+        "init_watermark_path":"./perturbation.pt",
         "batch_size":64
     },
     "attacks":{
