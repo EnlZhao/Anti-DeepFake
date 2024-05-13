@@ -2,7 +2,7 @@
     "global_settings":{
         "data_path":"./data/img_align_celeba",
         "attr_path":"./data/list_attr_celeba.txt",
-        "results_path":"./data/disrupting-deepfakes-results",
+        "results_path":"./data/anti-deepfakes-results",
         "img_size":256,
         "num_test":128,
         "gpu":1,
