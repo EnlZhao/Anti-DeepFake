@@ -29,15 +29,15 @@ def parse(args=None):
         
     return args_attack
 
-
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
+if torch.cuda.is_available():
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 
 args_attack = parse()
-print(args_attack)
-os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.momentum))
-print("experiment dir is created")
-os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.momentum))))
-print("experiment config is saved")
+# print(args_attack)
+# os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.momentum))
+# print("experiment dir is created")
+# os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.momentum))))
+# print("experiment config is saved")
 
 # init attacker
 def init_Attack(args_attack):
@@ -47,8 +47,8 @@ def init_Attack(args_attack):
 pgd_attack = init_Attack(args_attack)
 
 # load the trained CMUA-Watermark
-if args_attack.global_settings.universal_perturbation_path:
-    pgd_attack.up = torch.load(args_attack.global_settings.universal_perturbation_path)
+if args_attack.global_settings.init_perturbation_path:
+    pgd_attack.up = torch.load(args_attack.global_settings.init_perturbation_path, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
 # Init the attacked models
 attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()

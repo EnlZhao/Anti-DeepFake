@@ -16,20 +16,16 @@ import numpy as np
 import time
 from attacks import LinfPGDAttack
 
-# use cpu by default
-
-# device = 'cpu'
-
-# load checkpoint
+# use GPU if available
+device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 def prepare_HiSD():
-    device = 'cuda:0' 
     config = get_config('HiSD/configs/celeba-hq_256.yaml')
     noise_dim = config['noise_dim']
     image_size = config['new_size']
     checkpoint = 'HiSD/gen_00600000.pt'
     trainer = HiSD_Trainer(config)
-    state_dict = torch.load(checkpoint)
+    state_dict = torch.load(checkpoint, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
     trainer.models.gen.load_state_dict(state_dict['gen_test'])
     trainer.models.gen.to(device)
 

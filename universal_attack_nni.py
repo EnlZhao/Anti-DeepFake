@@ -11,21 +11,9 @@ import attacks
 
 from model_data_prepare import prepare
 from evaluate import evaluate_multiple_models
-
 import nni
 
-
-class ObjDict(dict):
-    """
-    Makes a  dictionary behave like an object,with attribute-style access.
-    """
-    def __getattr__(self,name):
-        try:
-            return self[name]
-        except:
-            raise AttributeError(name)
-    def __setattr__(self,name,value):
-        self[name]=value
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def parse(args=None):
     with open(join('./setting.json'), 'r') as f:
@@ -43,9 +31,9 @@ def search():
     tuner_params = nni.get_next_parameter()
     args_attack.attacks.star_factor = float(tuner_params['star_factor'])
     args_attack.attacks.attention_factor = float(tuner_params['aggan_factor'])
-    args_attack.attacks.att_factor = float(tuner_params['att_factor'])
+    # args_attack.attacks.att_factor = float(tuner_params['att_factor'])
     args_attack.attacks.HiSD_factor = float(tuner_params['HiSD_factor'])
-    print(args_attack)
+    # print(args_attack)
     os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.momentum))
     print("experiment dir is created")
     os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.momentum))))
@@ -61,8 +49,8 @@ def search():
     for idx, (img_a, att_a, c_org) in enumerate(tqdm(attack_dataloader)):
         if args_attack.global_settings.num_test is not None and idx * args_attack.global_settings.batch_size == args_attack.global_settings.num_test:
             break
-        img_a = img_a.cuda() if args_attack.global_settings.gpu else img_a
-        att_a = att_a.cuda() if args_attack.global_settings.gpu else att_a
+        img_a = img_a.to(device)
+        att_a = att_a.to(device)
         att_a = att_a.type(torch.float)
 
         # attack stargan

@@ -10,4 +10,5 @@
 *.tar.gz
 /**/__pycache__
 /**/.DS_Store
+/data
 !demo_results/readme_image.png

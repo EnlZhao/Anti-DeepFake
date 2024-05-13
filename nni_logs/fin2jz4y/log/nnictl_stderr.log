@@ -1,0 +1,18 @@
+--------------------------------------------------------------------------------
+Experiment fin2jz4y start: 2024-05-13 14:49:20.844082
+--------------------------------------------------------------------------------
+Error: GPU not available. Please check your CUDA configuration
+    at GPUScheduler.run (/Users/ez/anaconda3/envs/deepfake/lib/python3.6/site-packages/nni_node/training_service/local/gpuScheduler.js:33:23)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async Promise.all (index 1)
+    at async LocalTrainingService.run (/Users/ez/anaconda3/envs/deepfake/lib/python3.6/site-packages/nni_node/training_service/local/localTrainingService.js:96:9)
+    at async Promise.all (index 2)
+    at async NNIManager.run (/Users/ez/anaconda3/envs/deepfake/lib/python3.6/site-packages/nni_node/core/nnimanager.js:625:9) {
+  cause: Error: GPU not available. Please check your CUDA configuration
+      at GPUScheduler.run (/Users/ez/anaconda3/envs/deepfake/lib/python3.6/site-packages/nni_node/training_service/local/gpuScheduler.js:33:23)
+      at processTicksAndRejections (node:internal/process/task_queues:96:5)
+      at async Promise.all (index 1)
+      at async LocalTrainingService.run (/Users/ez/anaconda3/envs/deepfake/lib/python3.6/site-packages/nni_node/training_service/local/localTrainingService.js:96:9)
+      at async Promise.all (index 2)
+      at async NNIManager.run (/Users/ez/anaconda3/envs/deepfake/lib/python3.6/site-packages/nni_node/core/nnimanager.js:625:9)
+}

@@ -31,11 +31,11 @@ def parse(args=None):
         
     return args_attack
 
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
-
-torch.backends.cudnn.enabled = False
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-device='cuda'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+if torch.cuda.is_available():
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
+    torch.backends.cudnn.enabled = False
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 args_attack = parse()
 print(args_attack)
@@ -57,7 +57,7 @@ pgd_attack = init_Attack(args_attack)
 
 # 载入已有扰动
 if args_attack.global_settings.init_perturbation_path:
-    pgd_attack.up = torch.load(args_attack.global_settings.init_perturbation_path)
+    pgd_attack.up = torch.load(args_attack.global_settings.init_perturbation_path, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
 # init the attacker models
 # attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
@@ -68,8 +68,8 @@ print("finished init the attacked models, only attack 2 epochs")
 for idx, (img_a, att_a, c_org) in enumerate(tqdm(attack_dataloader)):
     if args_attack.global_settings.num_test is not None and idx * args_attack.global_settings.batch_size == args_attack.global_settings.num_test:
         break
-    img_a = img_a.cuda() if args_attack.global_settings.gpu else img_a
-    att_a = att_a.cuda() if args_attack.global_settings.gpu else att_a
+    img_a = img_a.to(device)
+    att_a = att_a.to(device)
     att_a = att_a.type(torch.float)
 
     # attack stargan

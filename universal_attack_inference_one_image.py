@@ -1,46 +1,20 @@
 import argparse
-# import copy
 import json
-import os
 from os.path import join
-import sys
-# import matplotlib.image
-# from tqdm import tqdm
-from PIL import Image
-
 
 import torch
-# import torch.utils.data as data
 import torchvision.utils as vutils
 import torch.nn.functional as F
-from torchvision import transforms
-
-# from AttGAN.data import check_attribute_conflict
-
-# from data import CelebA
 import attacks
 
 from model_data_prepare import prepare
-# from evaluate import evaluate_multiple_models
-
-
-class ObjDict(dict):
-    """
-    Makes a  dictionary behave like an object,with attribute-style access.
-    """
-    def __getattr__(self,name):
-        try:
-            return self[name]
-        except:
-            raise AttributeError(name)
-    def __setattr__(self,name,value):
-        self[name]=value
 
 def parse(args=None):
     with open(join('./setting.json'), 'r') as f:
         args_attack = json.load(f, object_hook=lambda d: argparse.Namespace(**d))
     return args_attack
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # init attacker
 def init_Attack(args_attack):
@@ -49,17 +23,12 @@ def init_Attack(args_attack):
 
 if __name__ == "__main__":
     args_attack = parse()
-    print(args_attack)
-    os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.momentum))
-    print("experiment dir is created")
-    os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.momentum))))
-    print("experiment config is saved")
 
     pgd_attack = init_Attack(args_attack)
 
     # load the trained CMUA-Watermark
     if args_attack.global_settings.universal_perturbation_path:
-        pgd_attack.up = torch.load(args_attack.global_settings.universal_perturbation_path)
+        pgd_attack.up = torch.load(args_attack.global_settings.init_perturbation_path, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
     # Init the attacked models
     # attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F_, T, G, E, reference, gen_models = prepare()
@@ -81,8 +50,10 @@ if __name__ == "__main__":
     l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
     for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
-        img_a = img_a.cuda() if args_attack.global_settings.gpu else img_a
-        att_a = att_a.cuda() if args_attack.global_settings.gpu else att_a
+        img_a = img_a.to(device)
+        att_a = att_a.to(device)
+        # img_a = img_a.cuda() if args_attack.global_settings.gpu else img_a
+        # att_a = att_a.cuda() if args_attack.global_settings.gpu else att_a
         att_a = att_a.type(torch.float)
         x_noattack_list, x_fake_list = solver.test_universal_model_level(idx, img_a, c_org, pgd_attack.up, args_attack.stargan)
         for j in range(len(x_fake_list)):
@@ -116,8 +87,10 @@ if __name__ == "__main__":
     l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
     for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
-        img_a = img_a.cuda() if args_attack.global_settings.gpu else img_a
-        att_a = att_a.cuda() if args_attack.global_settings.gpu else att_a
+        img_a = img_a.to(device)
+        att_a = att_a.to(device)
+        # img_a = img_a.cuda() if args_attack.global_settings.gpu else img_a
+        # att_a = att_a.cuda() if args_attack.global_settings.gpu else att_a
         att_a = att_a.type(torch.float)
         x_noattack_list, x_fake_list = attentiongan_solver.test_universal_model_level(idx, img_a, c_org, pgd_attack.up, args_attack.AttentionGAN)
         for j in range(len(x_fake_list)):
@@ -151,8 +124,10 @@ if __name__ == "__main__":
     l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
     for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
-        img_a = img_a.cuda() if args_attack.global_settings.gpu else img_a
-        att_a = att_a.cuda() if args_attack.global_settings.gpu else att_a
+        img_a = img_a.to(device)
+        att_a = att_a.to(device)
+        # img_a = img_a.cuda() if args_attack.global_settings.gpu else img_a
+        # att_a = att_a.cuda() if args_attack.global_settings.gpu else att_a
         att_a = att_a.type(torch.float)
         
         with torch.no_grad():

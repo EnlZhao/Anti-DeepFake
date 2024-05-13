@@ -1,0 +1,10 @@
+[2024-05-13 14:49:20] INFO (nni.experiment/MainThread) Creating experiment, Experiment ID: [36mfin2jz4y[0m
+[2024-05-13 14:49:20] INFO (nni.experiment/MainThread) Starting web server...
+[2024-05-13 14:49:21] INFO (nni.experiment/MainThread) Setting up...
+[2024-05-13 14:49:22] INFO (nni.experiment/MainThread) Web UI URLs: [36mhttp://127.0.0.1:8080 http://10.193.161.197:8080[0m
+[2024-05-13 14:49:22] INFO (nni.tools.nnictl.launcher/MainThread) To stop experiment run "nnictl stop fin2jz4y" or "nnictl stop --all"
+[2024-05-13 14:49:22] INFO (nni.tools.nnictl.launcher/MainThread) Reference: https://nni.readthedocs.io/en/stable/Tutorial/Nnictl.html
+[2024-05-13 14:49:22] INFO (nni.tuner.tpe/MainThread) Using random seed 850243247
+[2024-05-13 14:49:22] INFO (nni.runtime.msg_dispatcher_base/MainThread) Dispatcher started
+[2024-05-13 14:49:46] INFO (nni.runtime.msg_dispatcher_base/MainThread) Dispatcher exiting...
+[2024-05-13 14:49:48] INFO (nni.runtime.msg_dispatcher_base/MainThread) Dispatcher terminiated
