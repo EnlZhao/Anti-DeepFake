@@ -11,5 +11,7 @@
 /**/__pycache__
 /**/.DS_Store
 /data
-!demo_results/readme_image.png
+stargan/data/*
 nni_logs/*
+!demo_results/readme_image.png
+!HiSD/examples/*

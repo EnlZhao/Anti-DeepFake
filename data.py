@@ -1,14 +1,27 @@
 from torch.utils import data
 from torchvision import transforms
-# from torchvision.datasets import ImageFolder
 from PIL import Image
 import torch
 import os
-# import random
-# import cv2
 import numpy as np
 
 class CelebA(data.Dataset):
+    """
+    A custom dataset class for the CelebA dataset.
+
+    Args: 
+        data_path (str): Path to the CelebA dataset.
+        attr_path (str): Path to the attribute file.
+        image_size (int): Image size.
+        mode (str): Mode of the dataset (train, valid, or test).
+        selected_attrs (list): Selected attributes for the CelebA dataset.
+        stargan_selected_attrs (list): Selected attributes for StarGAN.
+
+    Returns:
+        img (Tensor): Images.
+        att (Tensor): Attributes.
+        label (Tensor): Labels.
+    """
     def __init__(self, data_path, attr_path, image_size, mode, selected_attrs, stargan_selected_attrs):
         super(CelebA, self).__init__()
         self.data_path = data_path
@@ -46,7 +59,14 @@ class CelebA(data.Dataset):
         self.preprocess()
 
     def preprocess(self):
-        """Preprocess the CelebA attribute file."""
+        """
+        Preprocesses the CelebA dataset by reading attribute values from a file,
+            creating mappings between attribute names and indices, and constructing
+            the test dataset with filenames and corresponding labels.
+
+            Returns:
+                None        
+        """
         lines = [line.rstrip() for line in open(self.attr_path, 'r')]
         all_attr_names = lines[1].split()
         for i, attr_name in enumerate(all_attr_names):
@@ -67,6 +87,9 @@ class CelebA(data.Dataset):
         print('Finished preprocessing the CelebA dataset...')
 
     def __getitem__(self, index):
+        """
+        Returns the image, attribute, and label.
+        """
         img = self.tf(Image.open(os.path.join(self.data_path, self.images[index])))
         att = torch.tensor((self.labels[index] + 1) // 2)
         filename, label = self.test_dataset[index]
@@ -74,6 +97,9 @@ class CelebA(data.Dataset):
         return img, att, torch.FloatTensor(label)
         
     def __len__(self):
+        """
+        Returns the length of the dataset. Namely, the number of images.
+        """
         return self.length
 
 

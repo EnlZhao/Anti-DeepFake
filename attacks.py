@@ -1,10 +1,9 @@
-import copy
 import numpy as np
 import torch
 import torch.nn as nn
 
 class LinfPGDAttack(object):
-    def __init__(self, model=None, device=None, epsilon=0.05, step=10, alpha=0.01, star_factor=0.3, attention_factor=0.3, att_factor=2, HiSD_factor=1, feat=None, args=None):
+    def __init__(self, model=None, device=None, epsilon=0.05, k=10, a=0.01, star_factor=0.3, attention_factor=0.3, HiSD_factor=1, feat=None, args=None):
         """
         FGSM, I-FGSM and PGD attacks
         epsilon: magnitude of attack
@@ -13,8 +12,8 @@ class LinfPGDAttack(object):
         """
         self.model = model
         self.epsilon = epsilon
-        self.step = step
-        self.alpha = alpha
+        self.step = k
+        self.alpha = a
         self.loss_fn = nn.MSELoss().to(device)
         self.device = device
 
@@ -43,7 +42,8 @@ class LinfPGDAttack(object):
             X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
         else:
             X = X_nat.clone().detach_()
-
+             # use the following if FGSM or I-FGSM and random seeds are fixed
+            # X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-0.001, 0.001, X_nat.shape).astype('float32')).cuda()    
 
         for i in range(self.step):
             X.requires_grad = True
@@ -57,7 +57,9 @@ class LinfPGDAttack(object):
             loss = self.loss_fn(output, y)
             loss.backward()
             grad = X.grad
+
             X_adv = X + self.alpha * grad.sign()
+            
             eta = torch.clamp(X_adv - X_nat, min=-self.epsilon, max=self.epsilon)
             X = torch.clamp(X_nat + eta, min=-1, max=1).detach_()
 
@@ -196,16 +198,3 @@ def clip_tensor(X, Y, Z):
     X_clipped = np.clip(X_np, Y_np, Z_np)
     X_res = torch.FloatTensor(X_clipped)
     return X_res
-
-def perturb_batch(X, y, c_trg, model, adversary):
-    # Perturb batch function for adversarial training
-    model_cp = copy.deepcopy(model)
-    for p in model_cp.parameters():
-        p.requires_grad = False
-    model_cp.eval()
-    
-    adversary.model = model_cp
-
-    X_adv, _ = adversary.perturb(X, y, c_trg)
-
-    return X_adv

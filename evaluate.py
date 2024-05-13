@@ -1,41 +1,41 @@
 
 import torch
-import torch.nn.functional as F
-from torch import nn
-import numpy as np
+import torch.nn.functional as Func
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 NUM_TEST = 20
 
-def evaluate_multiple_models(args_attack, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models, pgd_attack):
+def evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F, T, G, E, reference, pgd_attack):
     #  HiDF inference and evaluating
     l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
-    for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
+    for idx, (origin_img, origin_att, c_org) in enumerate(test_dataloader):
         if idx == NUM_TEST:
             break
-        img_a = img_a.to(device)
+        origin_img = origin_img.to(device)
+        origin_att = origin_att.to(device)
+        origin_att = origin_att.type(torch.float)
         
         with torch.no_grad():
             # clean
-            c = E(img_a)
+            c = E(origin_img)
             c_trg = c
             s_trg = F(reference, 1)
             c_trg = T(c_trg, s_trg, 1)
             gen_noattack = G(c_trg)
             # adv
-            c = E(img_a + pgd_attack.up)
+            c = E(origin_img + pgd_attack.up)
             c_trg = c
             s_trg = F(reference, 1)
             c_trg = T(c_trg, s_trg, 1)
             gen = G(c_trg)
-            mask = abs(gen_noattack - img_a)
+            mask = abs(gen_noattack - origin_img)
             mask = mask[0,0,:,:] + mask[0,1,:,:] + mask[0,2,:,:]
             mask[mask>0.5] = 1
             mask[mask<0.5] = 0
 
-            l1_error += torch.nn.functional.l1_loss(gen, gen_noattack)
-            l2_error += torch.nn.functional.mse_loss(gen, gen_noattack)
+            l1_error += Func.l1_loss(gen, gen_noattack)
+            l2_error += Func.mse_loss(gen, gen_noattack)
             l0_error += (gen - gen_noattack).norm(0)
             min_dist += (gen - gen_noattack).norm(float('-inf'))
             if (((gen*mask - gen_noattack*mask)**2).sum() / (mask.sum()*3)) > 0.05:
@@ -48,23 +48,24 @@ def evaluate_multiple_models(args_attack, test_dataloader, solver, attentiongan_
     # stargan inference and evaluating
     l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
-    for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
+    for idx, (origin_img, origin_att, c_org) in enumerate(test_dataloader):
         if idx == NUM_TEST:
             break
-        img_a = img_a.to(device)
-        att_a = att_a.to(device)
-        att_a = att_a.type(torch.float)
-        x_noattack_list, x_fake_list = solver.test_universal_model_level(idx, img_a, c_org, pgd_attack.up, args_attack.stargan)
+        origin_img = origin_img.to(device)
+        origin_att = origin_att.to(device)
+        origin_att = origin_att.type(torch.float)
+
+        x_noattack_list, x_fake_list = solver.test_universal_watermark(origin_img, c_org, pgd_attack.up, args_attack.stargan)
         for j in range(len(x_fake_list)):
             gen_noattack = x_noattack_list[j]
             gen = x_fake_list[j]
-            mask = abs(gen_noattack - img_a)
+            mask = abs(gen_noattack - origin_img)
             mask = mask[0,0,:,:] + mask[0,1,:,:] + mask[0,2,:,:]
             mask[mask>0.5] = 1
             mask[mask<0.5] = 0
 
-            l1_error += torch.nn.functional.l1_loss(gen, gen_noattack)
-            l2_error += torch.nn.functional.mse_loss(gen, gen_noattack)
+            l1_error += Func.l1_loss(gen, gen_noattack)
+            l2_error += Func.mse_loss(gen, gen_noattack)
             l0_error += (gen - gen_noattack).norm(0)
             min_dist += (gen - gen_noattack).norm(float('-inf'))
             if (((gen*mask - gen_noattack*mask)**2).sum() / (mask.sum()*3)) > 0.05:
@@ -78,23 +79,23 @@ def evaluate_multiple_models(args_attack, test_dataloader, solver, attentiongan_
     # AttentionGAN inference and evaluating
     l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
-    for idx, (img_a, att_a, c_org) in enumerate(test_dataloader):
+    for idx, (origin_img, origin_att, c_org) in enumerate(test_dataloader):
         if idx == NUM_TEST:
             break
-        img_a = img_a.to(device)
-        att_a = att_a.to(device)
-        att_a = att_a.type(torch.float)
-        x_noattack_list, x_fake_list = attentiongan_solver.test_universal_model_level(idx, img_a, c_org, pgd_attack.up, args_attack.AttentionGAN)
+        origin_img = origin_img.to(device)
+        origin_att = origin_att.to(device)
+        origin_att = origin_att.type(torch.float)
+        x_noattack_list, x_fake_list = attentiongan_solver.test_universal_watermark(origin_img, c_org, pgd_attack.up, args_attack.AttentionGAN)
         for j in range(len(x_fake_list)):
             gen_noattack = x_noattack_list[j]
             gen = x_fake_list[j]
-            mask = abs(gen_noattack - img_a)
+            mask = abs(gen_noattack - origin_img)
             mask = mask[0,0,:,:] + mask[0,1,:,:] + mask[0,2,:,:]
             mask[mask>0.5] = 1
             mask[mask<0.5] = 0
 
-            l1_error += torch.nn.functional.l1_loss(gen, gen_noattack)
-            l2_error += torch.nn.functional.mse_loss(gen, gen_noattack)
+            l1_error += Func.l1_loss(gen, gen_noattack)
+            l2_error += Func.mse_loss(gen, gen_noattack)
             l0_error += (gen - gen_noattack).norm(0)
             min_dist += (gen - gen_noattack).norm(float('-inf'))
             if (((gen*mask - gen_noattack*mask)**2).sum() / (mask.sum()*3)) > 0.05:

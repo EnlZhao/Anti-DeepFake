@@ -1,4 +1,3 @@
-# from torch.autograd import Variable
 from torchvision.utils import save_image
 import torch
 import torch.nn.functional as F
@@ -8,25 +7,17 @@ import time
 import datetime
 
 try:
-    from model import Generator #, AvgBlurGenerator
+    from model import Generator 
     from model import Discriminator
     import defenses.smoothing as smoothing
     import attacks
 except:
-    from .model import Generator #, AvgBlurGenerator
+    from .model import Generator 
     from .model import Discriminator
     import stargan.defenses.smoothing as smoothing
     import stargan.attacks as attacks
 
-# from PIL import ImageFilter
-# from PIL import Image
-# from torchvision import transforms
-
-# torch.manual_seed(0)
-# torch.backends.cudnn.deterministic = True
-# torch.backends.cudnn.benchmark = False
 np.random.seed(0)
-
 
 class Solver(object):
     """Solver for training and testing StarGAN."""
@@ -1309,9 +1300,10 @@ class Solver(object):
         preproc = smoothing.GaussianSmoothing2D(sigma=1.5, channels=3, kernel_size=11).to(self.device)
         return preproc(tensor)
 
-    def test_universal_model_level_attack(self, i, x_real, c_org, pgd_attack):
-        """Universal Attack by Huang Hao"""
-
+    def test_universal_model_level_attack(self, x_real, c_org, pgd_attack):
+        """
+        Universal Attack
+        """
         # Load the trained generator.
         # self.restore_model(self.test_iters)
 
@@ -1321,7 +1313,7 @@ class Solver(object):
         # Translated images.
         x_fake_list = [x_real]
 
-        for idx, c_trg in enumerate(c_trg_list):
+        for c_trg in c_trg_list:
             # print('image', i, 'class', idx)
             with torch.no_grad():
                 x_real_mod = x_real
@@ -1331,8 +1323,10 @@ class Solver(object):
             # Attacks
             x_adv, perturb = pgd_attack.universal_perturb_stargan(x_real, gen_noattack, c_trg, self.G)  # Vanilla
 
-    def test_universal_model_level(self, i, x_real, c_org, perturb, args):
-        """Universal Attack by Huang Hao"""
+    def test_universal_watermark(self, x_real, c_org, perturb, args):
+        """
+        Universal Attack by
+        """
 
         # Load the trained generator.
         # self.restore_model(self.test_iters)
@@ -1346,21 +1340,12 @@ class Solver(object):
         x_fake_list = [x_real, x_adv]
         x_noattack_list = []
 
-        for idx, c_trg in enumerate(c_trg_list):
+        for c_trg in c_trg_list:
             with torch.no_grad():
                 gen_noattack, gen_noattack_feats = self.G(x_real, c_trg)
                 gen, gen_feats = self.G(x_adv, c_trg)
                 x_fake_list.append(gen)
                 x_noattack_list.append(gen_noattack)
 
-        # x_concat = torch.cat(x_fake_list, dim=3)
-        # result_path = os.path.join(args.compare_output_path, '{}-images.jpg'.format(i+182638))
-        # save_image(self.denorm(x_concat.data.cpu()), result_path, nrow=1, padding=0)
-        # # 只保存对抗生成的图片做指标评测
-        # for j in range(len(x_fake_list)-2):
-        #     result_path = os.path.join(args.details_output_path, '{}-images-{}.jpg'.format(i+182638, j))
-        #     save_image(self.denorm(x_fake_list[j+2].data.cpu()), result_path, nrow=1, padding=0)
-
-        # print('Saved real and fake images into {}...'.format(result_path))
         return x_noattack_list, x_fake_list[2:]
 

@@ -13,9 +13,9 @@
     "attacks":{
         "momentum":0.5,
         "epsilon":0.05,
-        "step":10,
+        "k":10,
         "universal":1,
-        "alpha":0.01,
+        "a":0.01,
         "star_factor": 1,
         "attention_factor": 1,
         "att_factor": 1,

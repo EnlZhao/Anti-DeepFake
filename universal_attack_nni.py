@@ -1,46 +1,28 @@
-import argparse
-import json
 import os
-from os.path import join
 from tqdm import tqdm
 
 import torch
 import torchvision.utils as vutils
 
-import attacks
-
-from model_data_prepare import prepare
-from evaluate import evaluate_multiple_models
+from model_data_prepare import parse, prepare, init_Attacker
+from evaluate import evalute_models
 import nni
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-def parse(args=None):
-    with open(join('./setting.json'), 'r') as f:
-        args_attack = json.load(f, object_hook=lambda d: argparse.Namespace(**d))
-    
-    return args_attack
-
-# Init the attacker
-def init_Attack(args_attack):
-    pgd_attack = attacks.LinfPGDAttack(model=None, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), epsilon=args_attack.attacks.epsilon, step=args_attack.attacks.step, alpha=args_attack.attacks.alpha, star_factor=args_attack.attacks.star_factor, attention_factor=args_attack.attacks.attention_factor, att_factor=args_attack.attacks.att_factor, HiSD_factor=args_attack.attacks.HiSD_factor, args=args_attack.attacks)
-    return pgd_attack
 
 def search():
     args_attack = parse()
     tuner_params = nni.get_next_parameter()
     args_attack.attacks.star_factor = float(tuner_params['star_factor'])
     args_attack.attacks.attention_factor = float(tuner_params['aggan_factor'])
-    # args_attack.attacks.att_factor = float(tuner_params['att_factor'])
     args_attack.attacks.HiSD_factor = float(tuner_params['HiSD_factor'])
-    # print(args_attack)
     os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.momentum))
     print("experiment dir is created")
     os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.momentum))))
     print("experiment config is saved")
 
     # Init the attacker
-    pgd_attack = init_Attack(args_attack)
+    pgd_attack = init_Attacker(args_attack)
     # Init the attacked models
     attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
     print("finished init the attacked models, only attack 2 epochs")
@@ -54,10 +36,10 @@ def search():
         att_a = att_a.type(torch.float)
 
         # attack stargan
-        solver.test_universal_model_level_attack(idx, img_a, c_org, pgd_attack)
+        solver.test_universal_model_level_attack(img_a, c_org, pgd_attack)
 
         # attack attentiongan
-        attentiongan_solver.test_universal_model_level_attack(idx, img_a, c_org, pgd_attack)
+        attentiongan_solver.test_universal_model_level_attack(img_a, c_org, pgd_attack)
 
         # attack HiSD
         with torch.no_grad():
@@ -71,13 +53,13 @@ def search():
             mask[mask>0.5] = 1
             mask[mask<0.5] = 0
             vutils.save_image(((x_trg + 1)/ 2).data, './adv_output_ori.jpg', padding=0)
-        pgd_attack.universal_perturb_HiSD(img_a.cuda(), transform, F, T, G, E, reference, x_trg+0.002, gen_models, mask)
+        pgd_attack.universal_perturb_HiSD(img_a.to(device), transform, F, T, G, E, reference, x_trg+0.002, gen_models, mask)
         torch.save(pgd_attack.up, args_attack.global_settings.universal_perturbation_path)
         print('save the CMUA-Watermark')
 
 
     print('The size of CMUA-Watermark: ', pgd_attack.up.shape)
-    HiDF_prop_dist, stargan_prop_dist, aggan_prop_dist = evaluate_multiple_models(args_attack, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models, pgd_attack)
+    HiDF_prop_dist, stargan_prop_dist, aggan_prop_dist = evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F, T, G, E, reference, pgd_attack)
     nni.report_intermediate_result(HiDF_prop_dist)
     nni.report_intermediate_result(stargan_prop_dist)
     nni.report_intermediate_result(aggan_prop_dist)

@@ -1,62 +1,37 @@
 import argparse
 import json
-# import os
 from os.path import join
-# import sys
-# import matplotlib.image
-# from tqdm import tqdm
-# import nni
-
-# import torch
+import torch
 import torch.utils.data as data
-# import torchvision.utils as vutils
-# import torch.nn.functional as F
-
+import attacks
 from data import CelebA
-# import attacks
-
-# from AttGAN.attgan import AttGAN
-# from AttGAN.data import check_attribute_conflict
-# from AttGAN.helpers import Progressbar
-# from AttGAN.utils import find_model
-# import AttGAN.attacks as attgan_attack # Attack of AttGan
 from stargan.solver import Solver
 from AttentionGAN.AttentionGAN_v1_multi.solver import Solver as AttentionGANSolver
 from HiSD.inference import prepare_HiSD
 
-class ObjDict(dict):
-    """
-    Makes a  dictionary behave like an object,with attribute-style access.
-    """
-    def __getattr__(self,name):
-        try:
-            return self[name]
-        except:
-            raise AttributeError(name)
-    def __setattr__(self,name,value):
-        self[name]=value
-
+# init setting
 def parse(args=None):
     with open(join('./setting.json'), 'r') as f:
         args_attack = json.load(f, object_hook=lambda d: argparse.Namespace(**d))
     return args_attack
+
+# init attacker
+def init_Attacker(args_attack):
+    pgd_attack = attacks.LinfPGDAttack(model=None, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), epsilon=args_attack.attacks.epsilon, k=args_attack.attacks.k, a=args_attack.attacks.a, star_factor=args_attack.attacks.star_factor, attention_factor=args_attack.attacks.attention_factor, HiSD_factor=args_attack.attacks.HiSD_factor, args=args_attack.attacks)
+    return pgd_attack
 
 # init AttGAN
 def init_args(args_attack):
     with open(join('./AttGAN/output', args_attack.AttGAN.attgan_experiment_name, 'setting.txt'), 'r') as f:
         args = json.load(f, object_hook=lambda d: argparse.Namespace(**d))
 
-    args.test_int = args_attack.AttGAN.attgan_test_int
+    # args.test_int = args_attack.AttGAN.attgan_test_int
     args.num_test = args_attack.global_settings.num_test
     args.gpu = args_attack.global_settings.gpu
-    args.load_epoch = args_attack.AttGAN.attgan_load_epoch
-    args.multi_gpu = args_attack.AttGAN.attgan_multi_gpu
+    # args.load_epoch = args_attack.AttGAN.attgan_load_epoch
+    # args.multi_gpu = args_attack.AttGAN.attgan_multi_gpu
     args.n_attrs = len(args.attrs)
     args.betas = (args.beta1, args.beta2)
-    # attgan = AttGAN(args)
-    # attgan.load(find_model(join('./AttGAN/output', args.experiment_name, 'checkpoint'), args.load_epoch))
-    # attgan.eval()
-    # return attgan, args
     return args
 
 # init stargan
@@ -105,8 +80,4 @@ def prepare():
     attentiongan_solver.restore_model(attentiongan_solver.test_iters)
     transform, F, T, G, E, reference, gen_models = prepare_HiSD()
     print("Finished deepfake models initialization!")
-    # return attack_dataloader, test_dataloader, attgan, attgan_args, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models
     return attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models
-
-if __name__=="__main__":
-    prepare()
