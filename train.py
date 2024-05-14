@@ -40,21 +40,21 @@ if __name__ == "__main__":
 
     # init the attacker models
     attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
-    print("finished init the attacked models, only attack 2 epochs")
+    print(f"finished init the attacked models, only attack {args_attack.global_settings.num_test // args_attack.global_settings.batch_size} epochs")
 
     # attacking models
     for idx, (img_a, att_a, c_org) in enumerate(tqdm(attack_dataloader)):
-        if args_attack.global_settings.num_test is not None and idx * args_attack.global_settings.batch_size == args_attack.global_settings.num_test:
+        if args_attack.global_settings.num_test is not None and idx * args_attack.global_settings.batch_size >= args_attack.global_settings.num_test:
             break
         img_a = img_a.to(device)
         att_a = att_a.to(device)
         att_a = att_a.type(torch.float)
 
         # attack stargan
-        solver.test_universal_model_level_attack(img_a, c_org, pgd_attack)
+        solver.universal_perturb(img_a, c_org, pgd_attack)
 
         # attack attentiongan
-        attentiongan_solver.test_universal_model_level_attack(img_a, c_org, pgd_attack)
+        attentiongan_solver.universal_perturb(img_a, c_org, pgd_attack)
 
         # attack HiSD
         with torch.no_grad():
@@ -67,10 +67,11 @@ if __name__ == "__main__":
             mask = mask[0,0,:,:] + mask[0,1,:,:] + mask[0,2,:,:]
             mask[mask > 0.5] = 1
             mask[mask <= 0.5] = 0
-        pgd_attack.universal_perturb_HiSD(img_a, transform, F, T, G, E, reference, x_trg+0.002, gen_models, mask)
+        pgd_attack.perturb_HiSD(img_a, transform, F, T, G, E, reference, x_trg+0.002, gen_models, mask)
+        path, file_name = os.path.split(args_attack.global_settings.universal_watermark_path)
+        pt_file = os.path.join(path, '{}_'.format(idx) + file_name)
+        torch.save(pgd_attack.up, pt_file)
+        print('save the Watermark')
 
-        torch.save(pgd_attack.up, args_attack.global_settings.universal_perturbation_path)
-        print('save the CMUA-Watermark')
-
-    print('The size of CMUA-Watermark: ', pgd_attack.up.shape)
+    # print('The size of Watermark: ', pgd_attack.up.shape)
     evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F, T, G, E, reference, pgd_attack)

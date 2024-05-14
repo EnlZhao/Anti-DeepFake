@@ -3,7 +3,7 @@ import json
 from os.path import join
 import torch
 import torch.utils.data as data
-import attacks
+from stargan.attacks import PGDAttack
 from data import CelebA
 from stargan.solver import Solver
 from AttentionGAN.AttentionGAN_v1_multi.solver import Solver as AttentionGANSolver
@@ -25,7 +25,7 @@ def parse(args=None):
 
 # init attacker
 def init_Attacker(args_attack):
-    pgd_attack = attacks.LinfPGDAttack(model=None, device=device, epsilon=args_attack.attacks.epsilon, k=args_attack.attacks.k, a=args_attack.attacks.a, star_factor=args_attack.attacks.star_factor, attention_factor=args_attack.attacks.attention_factor, HiSD_factor=args_attack.attacks.HiSD_factor, args=args_attack.attacks)
+    pgd_attack = PGDAttack(model=None, device=device, epsilon=args_attack.attacks.epsilon, k=args_attack.attacks.k, a=args_attack.attacks.a, star_factor=args_attack.attacks.star_factor, attention_factor=args_attack.attacks.attention_factor, HiSD_factor=args_attack.attacks.HiSD_factor, args=args_attack.attacks)
     return pgd_attack
 
 # init AttGAN
@@ -33,11 +33,8 @@ def init_args(args_attack):
     with open(join('./stargan/setting.txt'), 'r') as f:
         args = json.load(f, object_hook=lambda d: argparse.Namespace(**d))
 
-    # args.test_int = args_attack.AttGAN.attgan_test_int
     args.num_test = args_attack.global_settings.num_test
     args.gpu = args_attack.global_settings.gpu
-    # args.load_epoch = args_attack.AttGAN.attgan_load_epoch
-    # args.multi_gpu = args_attack.AttGAN.attgan_multi_gpu
     args.n_attrs = len(args.attrs)
     args.betas = (args.beta1, args.beta2)
     return args
@@ -52,7 +49,10 @@ def init_attentiongan(args_attack, test_dataloader):
 
 # init attack data
 def init_attack_data(args_attack, attgan_args):
-    test_dataset = CelebA(args_attack.global_settings.data_path, args_attack.global_settings.attr_path, args_attack.global_settings.img_size, 'test', attgan_args.attrs,args_attack.stargan.selected_attrs)
+    test_dataset = CelebA(args=args_attack, data_path=args_attack.global_settings.data_path, 
+                          attr_path=args_attack.global_settings.attr_path, image_size=args_attack.global_settings.img_size, 
+                          mode=args_attack.global_settings.mode, selected_attrs=attgan_args.attrs,stargan_selected_attrs=args_attack.stargan.selected_attrs)
+    
     test_dataloader = data.DataLoader(
         test_dataset, batch_size=args_attack.global_settings.batch_size, num_workers=0,
         shuffle=False, drop_last=False
@@ -65,7 +65,10 @@ def init_attack_data(args_attack, attgan_args):
 
 # init inference data
 def init_inference_data(args_attack, attgan_args):
-    test_dataset = CelebA(args_attack.global_settings.data_path, args_attack.global_settings.attr_path, args_attack.global_settings.img_size, 'test', attgan_args.attrs,args_attack.stargan.selected_attrs)
+    test_dataset = CelebA(args=args_attack, data_path=args_attack.global_settings.data_path, 
+                          attr_path=args_attack.global_settings.attr_path, image_size=args_attack.global_settings.img_size, 
+                          mode=args_attack.global_settings.mode, selected_attrs=attgan_args.attrs,stargan_selected_attrs=args_attack.stargan.selected_attrs)
+    
     test_dataloader = data.DataLoader(
         test_dataset, batch_size=1, num_workers=0,
         shuffle=False, drop_last=False

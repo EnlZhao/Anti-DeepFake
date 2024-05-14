@@ -4,7 +4,6 @@ try:
 except:
     from AttentionGAN.AttentionGAN_v1_multi.model import Generator
     from AttentionGAN.AttentionGAN_v1_multi.model import Discriminator
-from torch.autograd import Variable
 from torchvision.utils import save_image
 import torch
 import torch.nn.functional as F
@@ -413,7 +412,7 @@ class Solver(object):
 
                 print('Saved real and fake images into {}...'.format(result_path))
 
-    def test_universal_model_level_attack(self, x_real, c_org, pgd_attack):
+    def universal_perturb(self, x_real, c_org, pgd_attack):
         """
         Universal Attack
         """

@@ -21,7 +21,7 @@ tuner:
     # tpe_args.n_ei_candidates: 24 #default 24 EI
 
 trial:
-  command: python universal_attack_nni.py
+  command: python3 nni.py
   codeDir: .
   gpuNum: 1
   
