@@ -80,7 +80,7 @@ mv ./weights/AttentionGAN/* ./AttentionGAN/AttentionGAN_v1_multi/checkpoints/cel
 mv ./weights/HiSD/* ./HiSD
 ```
 
-- 如果要进行 inference, 将网盘中的 pt 模型放到根目录下
+- 如果要进行 inference, 将网盘中的 pt 模型放到 ready_pt 目录下
 
 随后运行
 

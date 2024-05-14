@@ -49,7 +49,10 @@ def init_attentiongan(args_attack, test_dataloader):
 
 # init attack data
 def init_attack_data(args_attack, attgan_args):
-    test_dataset = CelebA(args_attack.global_settings.data_path, args_attack.global_settings.attr_path, args_attack.global_settings.img_size, 'test', attgan_args.attrs,args_attack.stargan.selected_attrs)
+    test_dataset = CelebA(args=args_attack, data_path=args_attack.global_settings.data_path, 
+                          attr_path=args_attack.global_settings.attr_path, image_size=args_attack.global_settings.img_size, 
+                          mode=args_attack.global_settings.mode, selected_attrs=attgan_args.attrs,stargan_selected_attrs=args_attack.stargan.selected_attrs)
+    
     test_dataloader = data.DataLoader(
         test_dataset, batch_size=args_attack.global_settings.batch_size, num_workers=0,
         shuffle=False, drop_last=False
@@ -62,7 +65,10 @@ def init_attack_data(args_attack, attgan_args):
 
 # init inference data
 def init_inference_data(args_attack, attgan_args):
-    test_dataset = CelebA(args_attack.global_settings.data_path, args_attack.global_settings.attr_path, args_attack.global_settings.img_size, 'test', attgan_args.attrs,args_attack.stargan.selected_attrs)
+    test_dataset = CelebA(args=args_attack, data_path=args_attack.global_settings.data_path, 
+                          attr_path=args_attack.global_settings.attr_path, image_size=args_attack.global_settings.img_size, 
+                          mode=args_attack.global_settings.mode, selected_attrs=attgan_args.attrs,stargan_selected_attrs=args_attack.stargan.selected_attrs)
+    
     test_dataloader = data.DataLoader(
         test_dataset, batch_size=1, num_workers=0,
         shuffle=False, drop_last=False

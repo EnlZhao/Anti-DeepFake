@@ -22,6 +22,7 @@ def search():
     args_attack.attacks.star_factor = float(tuner_params['star_factor'])
     args_attack.attacks.attention_factor = float(tuner_params['aggan_factor'])
     args_attack.attacks.HiSD_factor = float(tuner_params['HiSD_factor'])
+
     os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.momentum))
     print("experiment dir is created")
     os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.momentum))))
@@ -29,13 +30,14 @@ def search():
 
     # Init the attacker
     pgd_attack = init_Attacker(args_attack)
+
     # Init the attacked models
     attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
-    print("finished init the attacked models, only attack 2 epochs")
+    print(f"finished init the attacked models, only attack {args_attack.global_settings.num_test // args_attack.global_settings.batch_size} epochs")
 
     # attacking models
     for idx, (img_a, att_a, c_org) in enumerate(tqdm(attack_dataloader)):
-        if args_attack.global_settings.num_test is not None and idx * args_attack.global_settings.batch_size == args_attack.global_settings.num_test:
+        if args_attack.global_settings.num_test is not None and idx * args_attack.global_settings.batch_size >= args_attack.global_settings.num_test:
             break
         img_a = img_a.to(device)
         att_a = att_a.to(device)
@@ -60,11 +62,14 @@ def search():
             mask[mask<0.5] = 0
             vutils.save_image(((x_trg + 1)/ 2).data, './adv_output_ori.jpg', padding=0)
         pgd_attack.universal_perturb_HiSD(img_a.to(device), transform, F, T, G, E, reference, x_trg+0.002, gen_models, mask)
-        torch.save(pgd_attack.up, args_attack.global_settings.universal_perturbation_path)
-        print('save the CMUA-Watermark')
+        
+        path, file_name = os.path.split(args_attack.global_settings.universal_watermark_path)
+        pt_file = os.path.join(path, '{}_'.format(idx) + file_name)
+        torch.save(pgd_attack.up, pt_file)
+        print('save the Watermark')
 
 
-    print('The size of CMUA-Watermark: ', pgd_attack.up.shape)
+    # print('The size of Watermark: ', pgd_attack.up.shape)
     HiDF_prop_dist, stargan_prop_dist, aggan_prop_dist = evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F, T, G, E, reference, pgd_attack)
     nni.report_intermediate_result(HiDF_prop_dist)
     nni.report_intermediate_result(stargan_prop_dist)

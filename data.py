@@ -22,8 +22,9 @@ class CelebA(data.Dataset):
         att (Tensor): Attributes.
         label (Tensor): Labels.
     """
-    def __init__(self, data_path, attr_path, image_size, mode, selected_attrs, stargan_selected_attrs):
+    def __init__(self, args, data_path, attr_path, image_size, mode, selected_attrs, stargan_selected_attrs):
         super(CelebA, self).__init__()
+        self.args = args
         self.data_path = data_path
         self.attr_path = attr_path
         self.selected_attrs = selected_attrs
@@ -33,15 +34,27 @@ class CelebA(data.Dataset):
         images = np.loadtxt(attr_path, skiprows=2, usecols=[0], dtype=np.str_)
         labels = np.loadtxt(attr_path, skiprows=2, usecols=atts, dtype=np.int64)
         
-        if mode == 'train':
-            self.images = images[:182000]
-            self.labels = labels[:182000]
-        if mode == 'valid':
-            self.images = images[182000:182637]
-            self.labels = labels[182000:182637]
         if mode == 'test':
+            if self.args.global_settings.num_test is not None:
+                self.images = images[-self.args.global_settings.num_test:]
+                self.labels = labels[-self.args.global_settings.num_test:]
+            else:
+                self.images = images[-64:]
+                self.labels = labels[-64:]
+        elif mode == 'default-test':
             self.images = images[182637:]
             self.labels = labels[182637:]
+        elif mode == 'train':
+            self.images = images[:self.args.global_settings.num_test]
+            self.labels = labels[:self.args.global_settings.num_test]
+        elif mode == 'default-train':
+            self.images = images[:182000]
+            self.labels = labels[:182000]
+        elif mode == 'default-valid':
+            self.images = images[182000:182637]
+            self.labels = labels[182000:182637]
+        else:
+            raise Exception('Invalid mode')
         
         self.tf = transforms.Compose([
             transforms.CenterCrop(170),
