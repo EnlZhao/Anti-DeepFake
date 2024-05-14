@@ -145,7 +145,7 @@ class PGDAttack(object):
         model.zero_grad()
         return X, X - X_nat
 
-    def universal_perturb_HiSD(self, X_nat, transform, F, T, G, E, reference, y, gen, mask):
+    def perturb_HiSD(self, X_nat, transform, F, T, G, E, reference, y, gen, mask):
 
         X = X_nat.clone().detach_() + self.up+ torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
            

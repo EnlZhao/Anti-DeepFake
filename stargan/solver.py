@@ -1298,7 +1298,7 @@ class Solver(object):
         preproc = smoothing.GaussianSmoothing2D(sigma=1.5, channels=3, kernel_size=11).to(self.device)
         return preproc(tensor)
 
-    def test_universal_model_level_attack(self, x_real, c_org, pgd_attack):
+    def universal_perturb(self, x_real, c_org, pgd_attack):
         """
         Universal Attack
         """

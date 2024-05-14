@@ -412,7 +412,7 @@ class Solver(object):
 
                 print('Saved real and fake images into {}...'.format(result_path))
 
-    def test_universal_model_level_attack(self, x_real, c_org, pgd_attack):
+    def universal_perturb(self, x_real, c_org, pgd_attack):
         """
         Universal Attack
         """
