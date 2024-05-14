@@ -63,7 +63,7 @@ mklink /D data stargan\data\celeba
 
 创建好可以看到这样的效果：
 
-![alt text](./demo_results/readme_image.png)
+![alt text](./readme_img.png)
 
 ### 3. 加载模型的权重
 

@@ -13,7 +13,7 @@
 /data
 stargan/data/*
 nni_logs/*
-!demo_results/readme_image.png
+!readme_img.png
 !HiSD/examples/*
 !ready_pt/*
 !demo_input.jpg
