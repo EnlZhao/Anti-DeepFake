@@ -80,9 +80,7 @@ mv ./weights/AttentionGAN/* ./AttentionGAN/AttentionGAN_v1_multi/checkpoints/cel
 mv ./weights/HiSD/* ./HiSD
 ```
 
-- 如果要进行 inference, 将网盘中的 pt 模型放到 ready_pt 目录下
-
-随后运行
+- 进行 inference（ 初步训练好的的 pt 模型已经放到 ready_pt 目录下），直接运行：
 
 ```
 # inference in CelebA datasets with 20 images (you can change the test number in evaluate.py)
