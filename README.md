@@ -86,10 +86,14 @@ mv ./weights/HiSD/* ./HiSD
 
 ```
 # inference in CelebA datasets with 20 images (you can change the test number in evaluate.py)
-python3 universal_attack_inference.py
+python3 inference_evalute.py <test>
+```
 
+- `test` 为可选项，如果加入 `test` 参数表示用自己刚训练好的模型进行测试（需要预先自行为训练好的模型更名），否则使用预训练模型。
+
+```
 # inference with your own image (one image)
-python3 universal_attack_inference_one_image.py
+python3 inference_own_img.py [path/to/your/image]
 ```
 
 ## 训练模型
@@ -105,5 +109,5 @@ nnictl create --config ./nni_config.yaml
 得到超参后，修改 `setting.json` 中的 step size，然后运行
 
 ```
-python3 universal_attack.py
+python3 train.py
 ```

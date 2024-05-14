@@ -1,4 +1,5 @@
 import os
+import sys
 import torch
 from model_data_prepare import parse, prepare, init_Attacker
 from evaluate import evalute_models
@@ -20,13 +21,16 @@ if __name__ == "__main__":
     # init attacker
     pgd_attack = init_Attacker(args_attack)
 
-    # load the trained CMUA-Watermark
-    if args_attack.global_settings.init_watermark_path:
+    # load the trained Watermark
+    if len(sys.argv == 2) and sys.argv[1] == 'test':
+        if args_attack.global_settings.universal_watermark_path:
+            pgd_attack.up = torch.load(args_attack.global_settings.universal_watermark_path, map_location=device)
+    elif args_attack.global_settings.init_watermark_path:
         pgd_attack.up = torch.load(args_attack.global_settings.init_watermark_path, map_location=device)
 
     # Init the attacked models
     _, test_dataloader, solver, attentiongan_solver, _, F, T, G, E, reference, _ = prepare()
     print("finished init the attacked models")
 
-    print('The size of CMUA-Watermark: ', pgd_attack.up.shape)
+    # print('The size of Watermark: ', pgd_attack.up.shape)
     evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F, T, G, E, reference, pgd_attack)

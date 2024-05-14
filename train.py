@@ -34,9 +34,9 @@ if __name__ == "__main__":
 
     pgd_attack = init_Attacker(args_attack)
 
-    # # 载入已有扰动
-    # if args_attack.global_settings.init_watermark_path:
-    #     pgd_attack.up = torch.load(args_attack.global_settings.init_watermark_path, map_location=device)
+    # 载入已有扰动
+    if args_attack.global_settings.init_watermark_path:
+        pgd_attack.up = torch.load(args_attack.global_settings.init_watermark_path, map_location=device)
 
     # init the attacker models
     attack_dataloader, test_dataloader, solver, attentiongan_solver, transform, F, T, G, E, reference, gen_models = prepare()
