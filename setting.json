@@ -17,7 +17,7 @@
         "k":10,
         "universal":1,
         "a":0.01,
-        "star_factor": 0.6,
+        "star_factor": 0.3,
         "attention_factor": 0.6,
         "HiSD_factor": 1
     },
