@@ -12,7 +12,7 @@
 - install the lib by pip (推荐 conda or pipenv)
 
 ```
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ### 2. 准备数据集
