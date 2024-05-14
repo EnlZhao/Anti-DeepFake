@@ -23,7 +23,10 @@ if __name__ == "__main__":
     pgd_attack = init_Attacker(args_attack)
 
     # load the trained CMUA-Watermark
-    if args_attack.global_settings.init_watermark_path:
+    if sys.argv[1] == 'test':
+        if args_attack.global_settings.universal_watermark_path:
+            pgd_attack.up = torch.load(args_attack.global_settings.universal_watermark_path, map_location=device)
+    elif args_attack.global_settings.init_watermark_path:
         pgd_attack.up = torch.load(args_attack.global_settings.init_watermark_path, map_location=device)
 
     # Init the attacked models
@@ -36,7 +39,7 @@ if __name__ == "__main__":
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         ])
-    image = Image.open(sys.argv[1])
+    image = Image.open(sys.argv[2])
     img = image.convert("RGB")
     img = tf(img).unsqueeze(0)
 

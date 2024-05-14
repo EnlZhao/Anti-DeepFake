@@ -4,6 +4,8 @@
 
 ## Configuration
 
+支持 Mac / Linux / Windows 系统, 推荐使用 GPU 加速。
+
 ### 1. Python 环境
 
 - Python 3.8

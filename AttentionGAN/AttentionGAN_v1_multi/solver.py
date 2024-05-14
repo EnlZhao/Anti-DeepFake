@@ -4,7 +4,6 @@ try:
 except:
     from AttentionGAN.AttentionGAN_v1_multi.model import Generator
     from AttentionGAN.AttentionGAN_v1_multi.model import Discriminator
-from torch.autograd import Variable
 from torchvision.utils import save_image
 import torch
 import torch.nn.functional as F
