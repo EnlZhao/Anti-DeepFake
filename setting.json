@@ -45,7 +45,7 @@
         "n_critic":5,
         "beta1":0.5,
         "beta2":0.999,
-        "selected_attrs":["Black_Hair", "Blond_Hair", "Brown_Hair", "Male", "Young"],
+        "selected_attrs":["Black_Hair", "Blond_Hair", "Male", "Straight_Hair", "Young"],
 
         "test_iters":200000,
 

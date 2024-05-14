@@ -114,7 +114,6 @@ class PGDAttack(object):
         - X (torch.Tensor): The adversarial image tensor.
         - perturbation (torch.Tensor): The adversarial perturbation tensor.
         """
-        #iter_up = self.attention_up
         X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
         
         for i in range(self.step):
@@ -147,7 +146,7 @@ class PGDAttack(object):
 
     def perturb_HiSD(self, X_nat, transform, F, T, G, E, reference, y, gen, mask):
 
-        X = X_nat.clone().detach_() + self.up+ torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
+        X = X_nat.clone().detach_() + self.up + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
            
         for i in range(self.step):
             X.requires_grad = True
@@ -156,7 +155,6 @@ class PGDAttack(object):
             s_trg = F(reference, 1)
             c_trg = T(c_trg, s_trg, 1)
             x_trg = G(c_trg)
-            # model.zero_grad()
             gen.zero_grad()
 
             loss = self.loss_fn(x_trg, y)

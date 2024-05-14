@@ -1323,9 +1323,8 @@ class Solver(object):
 
     def test_universal_watermark(self, x_real, c_org, perturb, args):
         """
-        Universal Attack by
+        Universal Attack
         """
-
         # Load the trained generator.
         # self.restore_model(self.test_iters)
 

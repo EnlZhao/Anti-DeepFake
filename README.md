@@ -89,10 +89,22 @@ python3 inference_evalute.py <test>
 
 - `test` 为可选项，如果加入 `test` 参数表示用自己刚训练好的模型进行测试（需要预先自行为训练好的模型更名），否则使用预训练模型。
 
+- 其次你可以自己添加图片测试，**注意**：需要手动对 `inference_own_img` 中的 `c_org = torch.tensor([[0., 1., 0., 0., 1.]])` 做修改，这里的 `c_org` 是指属性标签，你需要根据你的图片属性做修改。
+
+> 属性包括：Label: ["Black_Hair", "Blond_Hair", "Male", "Straight_Hair", "Young"]， 0 为否，1 为是。
+
 ```
 # inference with your own image (one image)
 python3 inference_own_img.py [path/to/your/image]
 ```
+
+本仓库提供了一个 demo_input.jpg 用于测试, 直接运行即可:
+
+```
+python3 inference_own_img.py ./demo_input.jpg
+```
+
+
 
 ## 训练模型
 
@@ -109,3 +121,7 @@ nnictl create --config ./nni_config.yaml
 ```
 python3 train.py
 ```
+
+## Acknowledge
+
+[StarGAN](https://github.com/yunjey/stargan), [AttentionGAN](https://github.com/Ha0Tang/AttentionGAN), [HISD](https://github.com/imlixinyang/HiSD), [nni](https://github.com/microsoft/nni), [CMUA-Watermark](https://github.com/VDIGPKU/CMUA-Watermark)
