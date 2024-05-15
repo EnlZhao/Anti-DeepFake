@@ -5,11 +5,11 @@
         "results_path":"./data/anti-deepfakes-results",
         "mode": "test",
         "img_size":256,
-        "num_test":64,
+        "num_test":2,
         "gpu":1,
         "universal_watermark_path":"./results/perturbation.pt",
         "init_watermark_path":"./ready_pt/perturbation.pt",
-        "batch_size":8
+        "batch_size":1
     },
     "attacks":{
         "momentum":0.5,
@@ -17,9 +17,9 @@
         "k":10,
         "universal":1,
         "a":0.01,
-        "star_factor": 0.3,
-        "attention_factor": 0.6,
-        "HiSD_factor": 1
+        "star_factor": 4.2,
+        "attention_factor": 1,
+        "HiSD_factor": 2.2
     },
     "stargan":{
         "c_dim":5,

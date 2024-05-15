@@ -73,5 +73,4 @@ if __name__ == "__main__":
         torch.save(pgd_attack.up, pt_file)
         print('save the Watermark')
 
-    # print('The size of Watermark: ', pgd_attack.up.shape)
-    evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F, T, G, E, reference, pgd_attack)
+    # evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F, T, G, E, reference, pgd_attack)

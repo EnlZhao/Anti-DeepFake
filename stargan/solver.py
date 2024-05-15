@@ -1344,5 +1344,5 @@ class Solver(object):
                 x_fake_list.append(gen)
                 x_noattack_list.append(gen_noattack)
 
-        return x_noattack_list, x_fake_list[2:]
+        return x_adv, x_noattack_list, x_fake_list[2:]
 

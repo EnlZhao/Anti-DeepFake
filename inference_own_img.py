@@ -52,15 +52,18 @@ if __name__ == "__main__":
     print(f"Run stargan inference")
 
     img_stargan = img.clone().to(device)
-    x_noattack_list, x_fake_list = solver.test_universal_watermark(img_stargan, c_org, pgd_attack.up, args_attack.stargan)
+    x_adv, x_noattack_list, x_fake_list = solver.test_universal_watermark(img_stargan, c_org, pgd_attack.up, args_attack.stargan)
     
     for j in range(len(x_fake_list)):
         gen_noattack = x_noattack_list[j]
         gen = x_fake_list[j]
     
     # save original image
-    out_file = './demo_results/stargan_original.jpg'
+    out_file = './demo_results/original.jpg'
+    adv_file = './demo_results/adv.jpg'
     vutils.save_image(img_stargan.cpu(), out_file, nrow=1, normalize=True, value_range=(-1., 1.))
+    vutils.save_image(x_adv, adv_file, nrow=1, normalize=True, value_range=(-1., 1.))
+    
     for j in range(len(x_fake_list)):
         # save original image generated images
         gen_noattack = x_noattack_list[j]
@@ -80,10 +83,6 @@ if __name__ == "__main__":
     img_attgan = img.clone().to(device)
     x_noattack_list, x_fake_list = attentiongan_solver.test_universal_watermark(img_attgan, c_org, pgd_attack.up, args_attack.AttentionGAN)
     
-    # save original image
-    out_file = './demo_results/attentiongan_original.jpg'
-    vutils.save_image(img_attgan.cpu(), out_file, nrow=1, normalize=True, value_range=(-1., 1.))
-
     for j in range(len(x_fake_list)):
         # save original image generated images
         gen_noattack = x_noattack_list[j]
@@ -115,10 +114,6 @@ if __name__ == "__main__":
         s_trg = F(reference, 1)
         c_trg = T(c_trg, s_trg, 1)
         gen = G(c_trg)
-
-        # save original image
-        out_file = './demo_results/HiSD_original.jpg'
-        vutils.save_image(img_hisd.cpu(), out_file, nrow=1, normalize=True, value_range=(-1., 1.))
         
         # save deepfake images generated from clean image
         out_file = './demo_results/HiSD_gen.jpg'
