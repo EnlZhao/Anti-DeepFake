@@ -53,15 +53,11 @@ def main(config):
         if config.dataset in ['CelebA', 'RaFD']:
             # Normal inference
             # solver.test()
-            # Attack inference
-            # solver.test_attack() # hh:这个是默认的
+
             solver.test_universal_attack() # universal attack by hh
+            
             # Feature attack experiment
             # solver.test_attack_feats()
-            # Conditional attack experiment
-            # solver.test_attack_cond()
-        elif config.dataset in ['Both']:
-            solver.test_multi()
 
 
 if __name__ == '__main__':

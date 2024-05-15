@@ -42,14 +42,9 @@ def main(config):
     if config.mode == 'train':
         if config.dataset in ['CelebA', 'RaFD']:
             solver.train()
-        elif config.dataset in ['Both']:
-            solver.train_multi()
     elif config.mode == 'test':
         if config.dataset in ['CelebA', 'RaFD']:
             solver.test()
-        elif config.dataset in ['Both']:
-            solver.test_multi()
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
