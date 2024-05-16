@@ -9,7 +9,7 @@ import datetime
 from stargan.model import Generator 
 from stargan.model import Discriminator
 import stargan.defenses.smoothing as smoothing
-from stargan.attacks import attacks as attacks
+from stargan.attacks import PGDAttack, perturb_batch
 
 np.random.seed(0)
 
@@ -444,7 +444,7 @@ class Solver(object):
             label_org = label_org.to(self.device)  # Labels for computing classification loss.
             label_trg = label_trg.to(self.device)  # Labels for computing classification loss.
 
-            pgd_attack = attacks.PGDAttack(model=self.G, device=self.device, feat=None)
+            pgd_attack = PGDAttack(model=self.G, device=self.device, feat=None)
             # =================================================================================== #
             #                             2. Train the discriminator                              #
             # =================================================================================== #
@@ -488,8 +488,8 @@ class Solver(object):
 
             if (i + 1) % self.n_critic == 0:
                 # Original-to-target domain.
-                pgd_attack = attacks.PGDAttack(model=self.G, device=self.device, feat=None)
-                x_real_adv = attacks.perturb_batch(x_real, black, c_trg, self.G, pgd_attack)
+                pgd_attack = PGDAttack(model=self.G, device=self.device, feat=None)
+                x_real_adv = perturb_batch(x_real, black, c_trg, self.G, pgd_attack)
 
                 x_fake, _ = self.G(x_real_adv, c_trg)  # Attack
                 out_src, out_cls = self.D(x_fake)
@@ -497,7 +497,7 @@ class Solver(object):
                 g_loss_cls = self.classification_loss(out_cls, label_trg, self.dataset)
 
                 # Target-to-original domain.
-                x_fake_adv = attacks.perturb_batch(x_fake, black, c_org, self.G, pgd_attack)
+                x_fake_adv = perturb_batch(x_fake, black, c_org, self.G, pgd_attack)
                 x_reconst, _ = self.G(x_fake_adv, c_org)  # Attack
                 g_loss_rec = torch.mean(torch.abs(x_real - x_reconst))
 
@@ -617,8 +617,8 @@ class Solver(object):
             black = np.zeros((x_real.shape[0], 3, 256, 256))
             black = torch.FloatTensor(black).to(self.device)
 
-            pgd_attack = attacks.PGDAttack(model=self.G, device=self.device, feat=None)
-            x_real_adv = attacks.perturb_batch(x_real, black, c_trg, self.G, pgd_attack)  # Adversarial training
+            pgd_attack = PGDAttack(model=self.G, device=self.device, feat=None)
+            x_real_adv = perturb_batch(x_real, black, c_trg, self.G, pgd_attack)  # Adversarial training
 
             # =================================================================================== #
             #                             2. Train the discriminator                              #
@@ -631,7 +631,7 @@ class Solver(object):
 
             # Compute loss with fake images.
             x_fake, _ = self.G(x_real_adv, c_trg)  # Attack
-            x_fake_adv = attacks.perturb_batch(x_fake, black, c_org, self.G, pgd_attack)  # Adversarial training
+            x_fake_adv = perturb_batch(x_fake, black, c_org, self.G, pgd_attack)  # Adversarial training
             out_src, out_cls = self.D(x_fake_adv.detach())  # Attack
             d_loss_fake = torch.mean(out_src)
 
@@ -666,7 +666,7 @@ class Solver(object):
                 g_loss_cls = self.classification_loss(out_cls, label_trg, self.dataset)
 
                 # Target-to-original domain.
-                x_fake_adv = attacks.perturb_batch(x_fake, black, c_org, self.G, pgd_attack)
+                x_fake_adv = perturb_batch(x_fake, black, c_org, self.G, pgd_attack)
                 x_reconst, _ = self.G(x_fake_adv, c_org)  # Attack
                 g_loss_rec = torch.mean(torch.abs(x_real - x_reconst))
 
@@ -950,7 +950,7 @@ class Solver(object):
             x_real = x_real.to(self.device)
             c_trg_list = self.create_labels(c_org, self.c_dim, self.dataset, self.selected_attrs)
 
-            pgd_attack = attacks.PGDAttack(model=self.G, device=self.device, feat=None)
+            pgd_attack = PGDAttack(model=self.G, device=self.device, feat=None)
 
             # Translated images.
             x_fake_list = [x_real]
@@ -1019,7 +1019,7 @@ class Solver(object):
         l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
         n_dist, n_samples = 0, 0
 
-        pgd_attack = attacks.PGDAttack(model=self.G, device=self.device, feat=None)
+        pgd_attack = PGDAttack(model=self.G, device=self.device, feat=None)
 
         for i, (x_real, c_org) in enumerate(data_loader):
             # Prepare input images and target domain labels.
@@ -1121,7 +1121,7 @@ class Solver(object):
                 c_trg_list = self.create_labels(c_org, self.c_dim, self.dataset, self.selected_attrs)
 
                 layer_num = layer_dict[layer_num_orig]  # get layer number
-                pgd_attack = attacks.PGDAttack(model=self.G, device=self.device, feat=layer_num)
+                pgd_attack = PGDAttack(model=self.G, device=self.device, feat=layer_num)
 
                 # Translate images.
                 x_fake_list = [x_real]

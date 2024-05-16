@@ -22,7 +22,7 @@ if __name__ == "__main__":
     pgd_attack = init_Attacker(args_attack)
 
     # load the trained Watermark
-    if len(sys.argv == 2) and sys.argv[1] == 'test':
+    if len(sys.argv) == 2 and sys.argv[1] == 'test':
         if args_attack.global_settings.universal_watermark_path:
             pgd_attack.up = torch.load(args_attack.global_settings.universal_watermark_path, map_location=device)
     elif args_attack.global_settings.init_watermark_path:

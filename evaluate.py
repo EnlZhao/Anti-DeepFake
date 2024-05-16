@@ -12,7 +12,7 @@ NUM_TEST = 20
 
 def evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F, T, G, E, reference, pgd_attack):
     #  HiDF inference and evaluating
-    l1_error, l2_error, l0_error = 0.0, 0.0, 0.0, 0.0
+    l1_loss, l2_loss, l0_loss = 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
     for idx, (origin_img, origin_att, c_org) in enumerate(test_dataloader):
         if idx == NUM_TEST:
@@ -39,18 +39,18 @@ def evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F,
             mask[mask>0.5] = 1
             mask[mask<0.5] = 0
 
-            l1_error += Func.l1_loss(gen, gen_noattack)
-            l2_error += Func.mse_loss(gen, gen_noattack)
-            l0_error += (gen - gen_noattack).norm(0)
+            l1_loss += Func.l1_loss(gen, gen_noattack)
+            l2_loss += Func.mse_loss(gen, gen_noattack)
+            l0_loss += (gen - gen_noattack).norm(0)
             if (((gen*mask - gen_noattack*mask)**2).sum() / (mask.sum()*3)) > 0.05:
                 n_dist += 1
             n_samples += 1
 
-    print('HiDF {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}. '.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples))
+    print(f'HISD \t\t{n_samples} images. \tL1 loss: {l1_loss / n_samples}. \tL2 loss: {l2_loss / n_samples}. \tL0 loss: {l0_loss / n_samples}. \tdiff_proportion: {float(n_dist) * 100. / n_samples}%.')
     HiDF_prop_dist = float(n_dist) / n_samples
 
     # stargan inference and evaluating
-    l1_error, l2_error, l0_error = 0.0, 0.0, 0.0, 0.0
+    l1_loss, l2_loss, l0_loss = 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
     for idx, (origin_img, origin_att, c_org) in enumerate(test_dataloader):
         if idx == NUM_TEST:
@@ -59,7 +59,7 @@ def evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F,
         origin_att = origin_att.to(device)
         origin_att = origin_att.type(torch.float)
 
-        x_noattack_list, x_fake_list = solver.test_universal_watermark(origin_img, c_org, pgd_attack.up, args_attack.stargan)
+        x_adv, x_noattack_list, x_fake_list = solver.test_universal_watermark(origin_img, c_org, pgd_attack.up, args_attack.stargan)
         for j in range(len(x_fake_list)):
             gen_noattack = x_noattack_list[j]
             gen = x_fake_list[j]
@@ -68,19 +68,19 @@ def evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F,
             mask[mask>0.5] = 1
             mask[mask<0.5] = 0
 
-            l1_error += Func.l1_loss(gen, gen_noattack)
-            l2_error += Func.mse_loss(gen, gen_noattack)
-            l0_error += (gen - gen_noattack).norm(0)
+            l1_loss += Func.l1_loss(gen, gen_noattack)
+            l2_loss += Func.mse_loss(gen, gen_noattack)
+            l0_loss += (gen - gen_noattack).norm(0)
             if (((gen*mask - gen_noattack*mask)**2).sum() / (mask.sum()*3)) > 0.05:
                 n_dist += 1
             n_samples += 1
         
 
-    print('stargan {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}.'.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples))
+    print(f'StarGAN \t{n_samples} images. \tL1 loss: {l1_loss / n_samples}. \tL2 loss: {l2_loss / n_samples}. \tL0 loss: {l0_loss / n_samples}. \tdiff_proportion: {float(n_dist) * 100. / n_samples}%.')
     stargan_prop_dist = float(n_dist) / n_samples
 
     # AttentionGAN inference and evaluating
-    l1_error, l2_error, l0_error = 0.0, 0.0, 0.0, 0.0
+    l1_loss, l2_loss, l0_loss = 0.0, 0.0, 0.0
     n_dist, n_samples = 0, 0
     for idx, (origin_img, origin_att, c_org) in enumerate(test_dataloader):
         if idx == NUM_TEST:
@@ -88,7 +88,7 @@ def evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F,
         origin_img = origin_img.to(device)
         origin_att = origin_att.to(device)
         origin_att = origin_att.type(torch.float)
-        x_noattack_list, x_fake_list = attentiongan_solver.test_universal_watermark(origin_img, c_org, pgd_attack.up, args_attack.AttentionGAN)
+        x_adv, x_noattack_list, x_fake_list = attentiongan_solver.test_universal_watermark(origin_img, c_org, pgd_attack.up, args_attack.AttentionGAN)
         for j in range(len(x_fake_list)):
             gen_noattack = x_noattack_list[j]
             gen = x_fake_list[j]
@@ -97,14 +97,14 @@ def evalute_models(args_attack, test_dataloader, solver, attentiongan_solver, F,
             mask[mask>0.5] = 1
             mask[mask<0.5] = 0
 
-            l1_error += Func.l1_loss(gen, gen_noattack)
-            l2_error += Func.mse_loss(gen, gen_noattack)
-            l0_error += (gen - gen_noattack).norm(0)
+            l1_loss += Func.l1_loss(gen, gen_noattack)
+            l2_loss += Func.mse_loss(gen, gen_noattack)
+            l0_loss += (gen - gen_noattack).norm(0)
             if (((gen*mask - gen_noattack*mask)**2).sum() / (mask.sum()*3)) > 0.05:
                 n_dist += 1
             n_samples += 1
         
 
-    print('attentiongan {} images. L1 error: {}. L2 error: {}. prop_dist: {}. L0 error: {}.'.format(n_samples, l1_error / n_samples, l2_error / n_samples, float(n_dist) / n_samples, l0_error / n_samples))
+    print(f'AGGAN \t\t{n_samples} images. \tL1 loss: {l1_loss / n_samples}. \tL2 loss: {l2_loss / n_samples}. \tL0 loss: {l0_loss / n_samples}. \tdiff_proportion: {float(n_dist) * 100. / n_samples}%.')
     aggan_prop_dist = float(n_dist) / n_samples
     return HiDF_prop_dist, stargan_prop_dist, aggan_prop_dist
