@@ -46,7 +46,7 @@ if __name__ == "__main__":
     
     ###### Modify this label to fit your image ######
     # Label: ["Black_Hair", "Blond_Hair", "Male", "Straight_Hair", "Young"]
-    c_org = torch.tensor([[0., 1., 0., 0., 1.]])
+    c_org = torch.tensor([[1., 0., 0., 1., 1.]])
 
     # stargan inference
     print(f"Run stargan inference")
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     print(f"Run AttentionGAN inference")
 
     img_attgan = img.clone().to(device)
-    x_noattack_list, x_fake_list = attentiongan_solver.test_universal_watermark(img_attgan, c_org, pgd_attack.up, args_attack.AttentionGAN)
+    _, x_noattack_list, x_fake_list = attentiongan_solver.test_universal_watermark(img_attgan, c_org, pgd_attack.up, args_attack.AttentionGAN)
     
     for j in range(len(x_fake_list)):
         # save original image generated images
