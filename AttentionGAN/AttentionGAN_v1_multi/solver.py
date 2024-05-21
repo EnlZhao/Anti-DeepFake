@@ -424,11 +424,10 @@ class Solver(object):
         for i, c_trg in enumerate(c_trg_list):
             # Prepare input images and target domain labels.
             with torch.no_grad():
-                # x_fake_list.append(self.G(x_real, c_trg))
                 gen_noattack, attention, content = self.G(x_real, c_trg)
                 attention = (attention - 0.5) / 0.5
             # Attacks
-            x_adv, perturb = pgd_attack.universal_perturb_attentiongan(x_real, gen_noattack, c_trg, self.G)
+            x_adv, perturb = pgd_attack.perturb_attentiongan(x_real, gen_noattack, c_trg, self.G)
 
     def test_universal_watermark(self, x_real, c_org, perturb, args):
         """Translate images using StarGAN trained on a single dataset."""

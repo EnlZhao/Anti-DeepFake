@@ -40,6 +40,83 @@ class PGDAttack(object):
         self.attention_factor = attention_factor
         self.HiSD_factor = HiSD_factor
 
+    def perturb_stargan(self, X_nat, y, c_trg, model):
+        """
+        Vanilla Attack.
+        """
+        #iter_up = self.attention_up
+        X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
+
+        for i in range(self.step):
+            X.requires_grad = True
+            output, feats = model(X, c_trg)
+            if self.feat:
+                output = feats[self.feat]
+            model.zero_grad()
+            # Minus in the loss means "towards" and plus means "away from"
+            loss = self.loss_fn(output, y)
+            loss.backward()
+            grad = X.grad
+            X_adv = X + self.alpha * grad.sign()
+
+            if self.up is None:
+                eta = torch.mean(
+                    torch.clamp(self.star_factor * (X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(),
+                    dim=0)
+                self.up = eta
+            else:
+                eta = torch.mean(torch.clamp(self.star_factor * (X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(),dim=0)
+                self.up = self.up * self.momentum + eta * (1 - self.momentum)
+            X = torch.clamp(X_nat + self.up, min=-1, max=1).detach_()
+        model.zero_grad()
+        return X, X - X_nat
+
+    def perturb_attentiongan(self, X_nat, y, c_trg, model):
+        """
+        Vanilla Attack.
+        Generate universal adversarial perturbation for AttentionGAN model.
+
+        Args:
+        - X_nat (torch.Tensor): The natural image tensor.
+        - y (torch.Tensor): The true label tensor.
+        - c_trg (torch.Tensor): The target class tensor.
+        - model (torch.nn.Module): The AttentionGAN model.
+
+        Returns:
+        - X (torch.Tensor): The adversarial image tensor.
+        - perturbation (torch.Tensor): The adversarial perturbation tensor.
+        """
+        #iter_up = self.attention_up
+        X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
+
+        for i in range(self.step):
+            X.requires_grad = True
+            output, _, feats = model(X, c_trg)
+
+            if self.feat:
+                output = feats[self.feat]
+
+            model.zero_grad()
+            # Minus in the loss means "towards" and plus means "away from"
+            loss = self.loss_fn(output, y)
+            loss.backward()
+            grad = X.grad
+
+            X_adv = X + self.alpha * grad.sign()
+            if self.up is None:
+                eta = torch.mean(
+                    torch.clamp(self.attention_factor * (X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(),
+                    dim=0)
+                self.up = eta
+            else:
+                eta = torch.mean(
+                    torch.clamp(self.attention_factor * (X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(),
+                    dim=0)
+                self.up = self.up * self.momentum + eta * (1 - self.momentum)
+            X = torch.clamp(X_nat + self.up, min=-1, max=1).detach_()
+        model.zero_grad()
+        return X, X - X_nat
+
     def perturb_HiSD(self, X_nat, transform, F, T, G, E, reference, y, gen, mask):
 
         X = X_nat.clone().detach_() + self.up + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)

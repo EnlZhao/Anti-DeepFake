@@ -5,11 +5,11 @@
         "results_path":"./data/anti-deepfakes-results",
         "mode": "test",
         "img_size":256,
-        "num_test":2,
+        "num_test":32,
         "gpu":1,
         "universal_watermark_path":"./results/perturbation.pt",
         "init_watermark_path":"./ready_pt/perturbation.pt",
-        "batch_size":1
+        "batch_size":8
     },
     "attacks":{
         "momentum":0.5,

@@ -1188,7 +1188,7 @@ class Solver(object):
                 gen_noattack, gen_noattack_feats = self.G(x_real_mod, c_trg)
 
             # Attacks
-            x_adv, perturb = pgd_attack.universal_perturb_stargan(x_real, gen_noattack, c_trg, self.G)  # Vanilla
+            x_adv, perturb = pgd_attack.perturb_stargan(x_real, gen_noattack, c_trg, self.G)  # Vanilla
 
     def test_universal_watermark(self, x_real, c_org, perturb, args):
         """
