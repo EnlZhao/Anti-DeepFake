@@ -23,13 +23,13 @@ if __name__ == "__main__":
     # create the experiment dir
     if not os.path.exists('results'):
         os.makedirs('results')
-    if not os.path.exists(f"{args_attack.global_settings.results_path}/results{args_attack.attacks.momentum}"):
-        os.makedirs(f"{args_attack.global_settings.results_path}/results{args_attack.attacks.momentum}")
+    if not os.path.exists(f"{args_attack.global_settings.results_path}/results{args_attack.attacks.alpha}"):
+        os.makedirs(f"{args_attack.global_settings.results_path}/results{args_attack.attacks.alpha}")
 
-    os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.momentum))
+    os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.alpha))
     print("experiment dir is created")
 
-    os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.momentum))))
+    os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.alpha))))
     print("experiment config is saved")
 
     pgd_attack = init_Attacker(args_attack)
@@ -68,6 +68,7 @@ if __name__ == "__main__":
             mask[mask > 0.5] = 1
             mask[mask <= 0.5] = 0
         pgd_attack.perturb_HiSD(img_a, transform, F, T, G, E, reference, x_trg+0.002, gen_models, mask)
+        
         path, file_name = os.path.split(args_attack.global_settings.universal_watermark_path)
         pt_file = os.path.join(path, '{}_'.format(idx) + file_name)
         torch.save(pgd_attack.up, pt_file)

@@ -1171,20 +1171,13 @@ class Solver(object):
         """
         Universal Attack
         """
-        # Load the trained generator.
-        # self.restore_model(self.test_iters)
-
         # Prepare input images and target domain labels.
         x_real = x_real.to(self.device)
         c_trg_list = self.create_labels(c_org, self.c_dim, self.dataset, self.selected_attrs)
-        # Translated images.
-        x_fake_list = [x_real]
 
         for c_trg in c_trg_list:
-            # print('image', i, 'class', idx)
             with torch.no_grad():
-                x_real_mod = x_real
-                # x_real_mod = self.blur_tensor(x_real_mod) # use blur
+                x_real_mod = x_real.clone()
                 gen_noattack, gen_noattack_feats = self.G(x_real_mod, c_trg)
 
             # Attacks
@@ -1194,9 +1187,6 @@ class Solver(object):
         """
         Universal Attack
         """
-        # Load the trained generator.
-        # self.restore_model(self.test_iters)
-
         # Prepare input images and target domain labels.
         x_real = x_real.to(self.device)
         c_trg_list = self.create_labels(c_org, self.c_dim, self.dataset, self.selected_attrs)

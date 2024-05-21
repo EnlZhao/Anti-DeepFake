@@ -23,9 +23,9 @@ def search():
     args_attack.attacks.attention_factor = float(tuner_params['aggan_factor'])
     args_attack.attacks.HiSD_factor = float(tuner_params['HiSD_factor'])
 
-    os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.momentum))
+    os.system('cp -r ./results {}/results{}'.format(args_attack.global_settings.results_path, args_attack.attacks.alpha))
     print("experiment dir is created")
-    os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.momentum))))
+    os.system('cp ./setting.json {}'.format(os.path.join(args_attack.global_settings.results_path, 'results{}/setting.json'.format(args_attack.attacks.alpha))))
     print("experiment config is saved")
 
     # Init the attacker

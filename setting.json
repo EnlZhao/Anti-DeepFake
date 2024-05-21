@@ -12,7 +12,7 @@
         "batch_size":8
     },
     "attacks":{
-        "momentum":0.5,
+        "alpha":0.5,
         "epsilon":0.05,
         "k":10,
         "universal":1,

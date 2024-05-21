@@ -9,12 +9,13 @@ class PGDAttack(object):
         PGD attacks
         epsilon: magnitude of attack
         step: iterations
-        alpha: step size
+        a: step size
         """
         self.model = model
         self.epsilon = epsilon
         self.step = k
-        self.alpha = a
+        self.a = a
+        self.momentum = a / 2
         if device is not None:
             self.device = device
         elif torch.cuda.is_available():
@@ -33,7 +34,7 @@ class PGDAttack(object):
         self.att_up = None
         self.attention_up = None
         self.star_up = None
-        self.momentum = args.momentum
+        self.alpha = args.alpha
         
         #factors to control models' weights
         self.star_factor = star_factor
@@ -45,8 +46,8 @@ class PGDAttack(object):
         Vanilla Attack.
         """
         #iter_up = self.attention_up
-        X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
-
+        X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float64')).to(self.device)
+        mom = None
         for i in range(self.step):
             X.requires_grad = True
             output, feats = model(X, c_trg)
@@ -56,8 +57,11 @@ class PGDAttack(object):
             # Minus in the loss means "towards" and plus means "away from"
             loss = self.loss_fn(output, y)
             loss.backward()
-            grad = X.grad
-            X_adv = X + self.alpha * grad.sign()
+
+            # Momentum
+            grad = X.grad.sign()
+            mom = grad if mom is None else self.momentum * mom + self.a * grad
+            X_adv = X + mom
 
             if self.up is None:
                 eta = torch.mean(
@@ -66,7 +70,7 @@ class PGDAttack(object):
                 self.up = eta
             else:
                 eta = torch.mean(torch.clamp(self.star_factor * (X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(),dim=0)
-                self.up = self.up * self.momentum + eta * (1 - self.momentum)
+                self.up = self.up * self.alpha + eta * (1 - self.alpha)
             X = torch.clamp(X_nat + self.up, min=-1, max=1).detach_()
         model.zero_grad()
         return X, X - X_nat
@@ -86,8 +90,7 @@ class PGDAttack(object):
         - X (torch.Tensor): The adversarial image tensor.
         - perturbation (torch.Tensor): The adversarial perturbation tensor.
         """
-        #iter_up = self.attention_up
-        X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
+        X = X_nat.clone().detach_() + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float64')).to(self.device)
 
         for i in range(self.step):
             X.requires_grad = True
@@ -100,9 +103,12 @@ class PGDAttack(object):
             # Minus in the loss means "towards" and plus means "away from"
             loss = self.loss_fn(output, y)
             loss.backward()
-            grad = X.grad
 
-            X_adv = X + self.alpha * grad.sign()
+            # Momentum
+            grad = X.grad.sign()
+            mom = grad if mom is None else self.momentum * mom + self.a * grad
+            X_adv = X + mom
+
             if self.up is None:
                 eta = torch.mean(
                     torch.clamp(self.attention_factor * (X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(),
@@ -112,14 +118,14 @@ class PGDAttack(object):
                 eta = torch.mean(
                     torch.clamp(self.attention_factor * (X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(),
                     dim=0)
-                self.up = self.up * self.momentum + eta * (1 - self.momentum)
+                self.up = self.up * self.alpha + eta * (1 - self.alpha)
             X = torch.clamp(X_nat + self.up, min=-1, max=1).detach_()
         model.zero_grad()
         return X, X - X_nat
 
     def perturb_HiSD(self, X_nat, transform, F, T, G, E, reference, y, gen, mask):
 
-        X = X_nat.clone().detach_() + self.up + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float32')).to(self.device)
+        X = X_nat.clone().detach_() + self.up + torch.tensor(np.random.uniform(-self.epsilon, self.epsilon, X_nat.shape).astype('float64')).to(self.device)
            
         for i in range(self.step):
             X.requires_grad = True
@@ -132,9 +138,12 @@ class PGDAttack(object):
 
             loss = self.loss_fn(x_trg, y)
             loss.backward()
-            grad = X.grad
+            
+            # Momentum
+            grad = X.grad.sign()
+            mom = grad if mom is None else self.momentum * mom + self.a * grad
+            X_adv = X + mom
 
-            X_adv = X + self.alpha * grad.sign()
             if self.up is None:
                 eta = torch.mean(
                     torch.clamp(self.HiSD_factor * (X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(),
@@ -144,7 +153,7 @@ class PGDAttack(object):
                 eta = torch.mean(
                     torch.clamp(self.HiSD_factor * (X_adv - X_nat), min=-self.epsilon, max=self.epsilon).detach_(),
                     dim=0)
-                self.up = self.up * self.momentum + eta * (1 - self.momentum)
+                self.up = self.up * self.alpha + eta * (1 - self.alpha)
             X = torch.clamp(X_nat + self.up, min=-1, max=1).detach_()            
         gen.zero_grad()
         return X, X - X_nat
