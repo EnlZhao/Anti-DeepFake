@@ -46,7 +46,7 @@ if __name__ == "__main__":
     
     ###### Modify this label to fit your image ######
     # Label: ["Black_Hair", "Blond_Hair", "Male", "Straight_Hair", "Young"]
-    c_org = torch.tensor([[1., 0., 0., 1., 1.]])
+    c_org = torch.tensor([[0., 1., 0., 0., 1.]])
 
     # stargan inference
     print(f"Run stargan inference")

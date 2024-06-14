@@ -67,7 +67,7 @@ mklink /D data stargan\data\celeba
 
 ### 3. 加载模型的权重
 
-- 将百度网盘中的权重解压缩后移动到相应的位置（需要你先创建相应的文件夹）
+- 将[网盘](https://pan.zju.edu.cn/share/de382a9a3aaa0fc253c976b060)中的权重解压缩后移动到相应的位置（需要你先创建相应的文件夹）
 
 ```
 mkdir -p ./stargan/stargan_celeba_256/models
